@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, BookOpen, TrendingUp, Calendar, CheckCircle, AlertTriangle, Clock, Target } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { SectionHeader } from '@/components/ui/section-header';
@@ -7,6 +7,7 @@ import { GradeCard } from '@/components/academic/GradeCard';
 import { ScheduleCard } from '@/components/academic/ScheduleCard';
 import { CategoryPill } from '@/components/knowledge/CategoryPill';
 import { EmptyState } from '@/components/states/EmptyState';
+import { LoadingState } from '@/components/states/LoadingState';
 import { cn } from '@/lib/utils';
 
 const tabs = ['Overview', 'Subjects', 'Grades', 'Attendance', 'Schedule', 'Evaluations'];
@@ -58,6 +59,13 @@ const attendanceBySubject = [
 
 export default function AcademicPage() {
   const [activeTab, setActiveTab] = useState('Overview');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    const t = setTimeout(() => setLoading(false), 400);
+    return () => clearTimeout(t);
+  }, [activeTab]);
 
   const atRiskSubjects = subjects.filter(s => s.gradeColor === 'warning');
   const avgProgress = Math.round(subjects.reduce((sum, s) => sum + s.progress, 0) / subjects.length);
@@ -75,227 +83,221 @@ export default function AcademicPage() {
         ))}
       </div>
 
-      {activeTab === 'Overview' && (
-        <div className="space-y-6">
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div className="rounded-2xl border border-border bg-card p-4 text-center">
-              <BookOpen className="mx-auto h-5 w-5 text-primary" />
-              <p className="mt-2 font-heading text-xl font-bold text-foreground">{subjects.length}</p>
-              <p className="text-xs text-muted-foreground">Subjects</p>
-            </div>
-            <div className="rounded-2xl border border-border bg-card p-4 text-center">
-              <TrendingUp className="mx-auto h-5 w-5 text-success" />
-              <p className="mt-2 font-heading text-xl font-bold text-foreground">3.6</p>
-              <p className="text-xs text-muted-foreground">GPA</p>
-            </div>
-            <div className="rounded-2xl border border-border bg-card p-4 text-center">
-              <CheckCircle className="mx-auto h-5 w-5 text-info" />
-              <p className="mt-2 font-heading text-xl font-bold text-foreground">{attendanceData.present}%</p>
-              <p className="text-xs text-muted-foreground">Attendance</p>
-            </div>
-            <div className="rounded-2xl border border-border bg-card p-4 text-center">
-              <Calendar className="mx-auto h-5 w-5 text-warning" />
-              <p className="mt-2 font-heading text-xl font-bold text-foreground">{evaluations.filter(e => e.status === 'upcoming').length}</p>
-              <p className="text-xs text-muted-foreground">Upcoming Exams</p>
-            </div>
-          </div>
+      {loading ? (
+        <LoadingState variant={activeTab === 'Subjects' ? 'cards' : 'detail'} cards={activeTab === 'Subjects' ? 6 : 3} />
+      ) : (
+        <>
+          {activeTab === 'Overview' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-2xl border border-border bg-card p-4 text-center transition-all hover:shadow-sm">
+                  <BookOpen className="mx-auto h-5 w-5 text-primary" />
+                  <p className="mt-2 font-heading text-xl font-bold text-foreground">{subjects.length}</p>
+                  <p className="text-xs text-muted-foreground">Subjects</p>
+                </div>
+                <div className="rounded-2xl border border-border bg-card p-4 text-center transition-all hover:shadow-sm">
+                  <TrendingUp className="mx-auto h-5 w-5 text-success" />
+                  <p className="mt-2 font-heading text-xl font-bold text-foreground">3.6</p>
+                  <p className="text-xs text-muted-foreground">GPA</p>
+                </div>
+                <div className="rounded-2xl border border-border bg-card p-4 text-center transition-all hover:shadow-sm">
+                  <CheckCircle className="mx-auto h-5 w-5 text-info" />
+                  <p className="mt-2 font-heading text-xl font-bold text-foreground">{attendanceData.present}%</p>
+                  <p className="text-xs text-muted-foreground">Attendance</p>
+                </div>
+                <div className="rounded-2xl border border-border bg-card p-4 text-center transition-all hover:shadow-sm">
+                  <Calendar className="mx-auto h-5 w-5 text-warning" />
+                  <p className="mt-2 font-heading text-xl font-bold text-foreground">{evaluations.filter(e => e.status === 'upcoming').length}</p>
+                  <p className="text-xs text-muted-foreground">Upcoming Exams</p>
+                </div>
+              </div>
 
-          {/* At-risk alert */}
-          {atRiskSubjects.length > 0 && (
-            <div className="flex items-start gap-3 rounded-xl border border-warning/30 bg-warning/5 p-4">
-              <AlertTriangle className="h-4 w-4 text-warning mt-0.5 shrink-0" />
+              {atRiskSubjects.length > 0 && (
+                <div className="flex items-start gap-3 rounded-xl border border-warning/30 bg-warning/5 p-4">
+                  <AlertTriangle className="h-4 w-4 text-warning mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Attention needed</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {atRiskSubjects.map(s => s.name).join(', ')} {atRiskSubjects.length === 1 ? 'is' : 'are'} below target. Current progress: {atRiskSubjects.map(s => `${s.progress}%`).join(', ')}.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="rounded-2xl border border-border bg-card p-5">
+                <SectionHeader title="Academic Progress" subtitle={`Average: ${avgProgress}%`} />
+                <div className="mt-4 h-2 rounded-full bg-muted overflow-hidden">
+                  <div className="h-full rounded-full bg-primary transition-all duration-700" style={{ width: `${avgProgress}%` }} />
+                </div>
+                <div className="mt-3 flex gap-4 text-xs text-muted-foreground">
+                  <span>{subjects.filter(s => s.gradeColor === 'success').length} excelling</span>
+                  <span>·</span>
+                  <span>{subjects.filter(s => s.gradeColor === 'primary').length} on track</span>
+                  <span>·</span>
+                  <span>{atRiskSubjects.length} needs attention</span>
+                </div>
+              </div>
+
               <div>
-                <p className="text-sm font-medium text-foreground">Attention needed</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {atRiskSubjects.map(s => s.name).join(', ')} {atRiskSubjects.length === 1 ? 'is' : 'are'} below target. Current progress: {atRiskSubjects.map(s => `${s.progress}%`).join(', ')}.
-                </p>
+                <SectionHeader title="My Subjects" action={<button onClick={() => setActiveTab('Subjects')} className="text-xs font-medium text-primary hover:underline">View All</button>} />
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {subjects.slice(0, 3).map((s) => <SubjectCard key={s.name} {...s} />)}
+                </div>
+              </div>
+
+              <div>
+                <SectionHeader title="Recent Grades" action={<button onClick={() => setActiveTab('Grades')} className="text-xs font-medium text-primary hover:underline">All Grades</button>} />
+                <div className="mt-3 space-y-2">
+                  {recentGrades.slice(0, 3).map((g, i) => <GradeCard key={i} {...g} />)}
+                </div>
+              </div>
+
+              <ScheduleCard day="Today — Monday" items={scheduleItems.slice(0, 4)} />
+
+              <div>
+                <SectionHeader title="Upcoming Evaluations" action={<button onClick={() => setActiveTab('Evaluations')} className="text-xs font-medium text-primary hover:underline">View All</button>} />
+                <div className="mt-3 space-y-2">
+                  {evaluations.filter(e => e.status === 'upcoming').slice(0, 2).map((e, i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-xl border border-warning/30 bg-warning/5 p-4 transition-all hover:shadow-sm">
+                      <Target className="h-4 w-4 text-warning shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-foreground">{e.title} — {e.subject}</p>
+                        <p className="text-xs text-muted-foreground">{e.date} · {e.time} · {e.room} · Weight: {e.weight}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
-          {/* Overall progress */}
-          <div className="rounded-2xl border border-border bg-card p-5">
-            <SectionHeader title="Academic Progress" subtitle={`Average: ${avgProgress}%`} />
-            <div className="mt-4 h-2 rounded-full bg-muted overflow-hidden">
-              <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${avgProgress}%` }} />
+          {activeTab === 'Subjects' && (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {subjects.map((s) => <SubjectCard key={s.name} {...s} />)}
             </div>
-            <div className="mt-3 flex gap-4 text-xs text-muted-foreground">
-              <span>{subjects.filter(s => s.gradeColor === 'success').length} excelling</span>
-              <span>·</span>
-              <span>{subjects.filter(s => s.gradeColor === 'primary').length} on track</span>
-              <span>·</span>
-              <span>{atRiskSubjects.length} needs attention</span>
-            </div>
-          </div>
+          )}
 
-          {/* Subjects */}
-          <div>
-            <SectionHeader title="My Subjects" action={<button onClick={() => setActiveTab('Subjects')} className="text-xs font-medium text-primary hover:underline">View All</button>} />
-            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {subjects.slice(0, 3).map((s) => <SubjectCard key={s.name} {...s} />)}
-            </div>
-          </div>
-
-          {/* Recent Grades */}
-          <div>
-            <SectionHeader title="Recent Grades" action={<button onClick={() => setActiveTab('Grades')} className="text-xs font-medium text-primary hover:underline">All Grades</button>} />
-            <div className="mt-3 space-y-2">
-              {recentGrades.slice(0, 3).map((g, i) => <GradeCard key={i} {...g} />)}
-            </div>
-          </div>
-
-          {/* Schedule snapshot */}
-          <ScheduleCard day="Today — Monday" items={scheduleItems.slice(0, 4)} />
-
-          {/* Upcoming evaluations */}
-          <div>
-            <SectionHeader title="Upcoming Evaluations" action={<button onClick={() => setActiveTab('Evaluations')} className="text-xs font-medium text-primary hover:underline">View All</button>} />
-            <div className="mt-3 space-y-2">
-              {evaluations.filter(e => e.status === 'upcoming').slice(0, 2).map((e, i) => (
-                <div key={i} className="flex items-center gap-3 rounded-xl border border-warning/30 bg-warning/5 p-4">
-                  <Target className="h-4 w-4 text-warning shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">{e.title} — {e.subject}</p>
-                    <p className="text-xs text-muted-foreground">{e.date} · {e.time} · {e.room} · Weight: {e.weight}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'Subjects' && (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {subjects.map((s) => <SubjectCard key={s.name} {...s} />)}
-        </div>
-      )}
-
-      {activeTab === 'Grades' && (
-        <div className="space-y-6">
-          {/* Grade distribution */}
-          <div className="rounded-2xl border border-border bg-card p-5">
-            <SectionHeader title="Grade Distribution" />
-            <div className="mt-4 grid grid-cols-5 gap-2">
-              {['A+/A', 'A-/B+', 'B/B-', 'C+/C', 'Below C'].map((label, i) => {
-                const counts = [2, 1, 1, 1, 0];
-                const colors = ['bg-success', 'bg-success/70', 'bg-primary', 'bg-warning', 'bg-destructive'];
-                return (
-                  <div key={label} className="text-center">
-                    <div className="mx-auto h-20 w-full max-w-[40px] rounded-lg bg-muted overflow-hidden flex flex-col justify-end">
-                      <div className={cn('rounded-lg transition-all', colors[i])} style={{ height: `${(counts[i] / 3) * 100}%`, minHeight: counts[i] > 0 ? '8px' : 0 }} />
-                    </div>
-                    <p className="mt-1.5 text-[10px] font-medium text-muted-foreground">{label}</p>
-                    <p className="text-xs font-bold text-foreground">{counts[i]}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          {/* Grades list */}
-          <div className="space-y-2">
-            {recentGrades.map((g, i) => <GradeCard key={i} {...g} />)}
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'Attendance' && (
-        <div className="space-y-6">
-          <div className="rounded-2xl border border-border bg-card p-5">
-            <SectionHeader title="Overall Attendance" />
-            <div className="mt-6 flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
-              <div className="relative h-36 w-36">
-                <svg className="h-full w-full -rotate-90" viewBox="0 0 120 120">
-                  <circle cx="60" cy="60" r="50" fill="none" stroke="hsl(var(--muted))" strokeWidth="10" />
-                  <circle cx="60" cy="60" r="50" fill="none" stroke="hsl(var(--success))" strokeWidth="10" strokeLinecap="round" strokeDasharray={`${attendanceData.present * 3.14} ${100 * 3.14}`} />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="font-heading text-2xl font-bold text-foreground">{attendanceData.present}%</span>
-                  <span className="text-xs text-muted-foreground">Present</span>
+          {activeTab === 'Grades' && (
+            <div className="space-y-6">
+              <div className="rounded-2xl border border-border bg-card p-5">
+                <SectionHeader title="Grade Distribution" />
+                <div className="mt-4 grid grid-cols-5 gap-2">
+                  {['A+/A', 'A-/B+', 'B/B-', 'C+/C', 'Below C'].map((label, i) => {
+                    const counts = [2, 1, 1, 1, 0];
+                    const colors = ['bg-success', 'bg-success/70', 'bg-primary', 'bg-warning', 'bg-destructive'];
+                    return (
+                      <div key={label} className="text-center">
+                        <div className="mx-auto h-20 w-full max-w-[40px] rounded-lg bg-muted overflow-hidden flex flex-col justify-end">
+                          <div className={cn('rounded-lg transition-all duration-500', colors[i])} style={{ height: `${(counts[i] / 3) * 100}%`, minHeight: counts[i] > 0 ? '8px' : 0 }} />
+                        </div>
+                        <p className="mt-1.5 text-[10px] font-medium text-muted-foreground">{label}</p>
+                        <p className="text-xs font-bold text-foreground">{counts[i]}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-6 text-center">
-                <div><p className="font-heading text-lg font-bold text-success">{attendanceData.present}%</p><p className="text-xs text-muted-foreground">Present</p></div>
-                <div><p className="font-heading text-lg font-bold text-destructive">{attendanceData.absent}%</p><p className="text-xs text-muted-foreground">Absent</p></div>
-                <div><p className="font-heading text-lg font-bold text-warning">{attendanceData.late}%</p><p className="text-xs text-muted-foreground">Late</p></div>
+              <div className="space-y-2">
+                {recentGrades.map((g, i) => <GradeCard key={i} {...g} />)}
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Per-subject attendance */}
-          <div className="rounded-2xl border border-border bg-card p-5">
-            <SectionHeader title="By Subject" />
-            <div className="mt-4 space-y-3">
-              {attendanceBySubject.map(s => (
-                <div key={s.subject}>
-                  <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-medium text-foreground">{s.subject}</span>
-                    <span className={cn('font-bold', s.rate >= 80 ? 'text-success' : s.rate >= 70 ? 'text-warning' : 'text-destructive')}>{s.rate}%</span>
-                  </div>
-                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                    <div className={cn('h-full rounded-full transition-all', s.rate >= 80 ? 'bg-success' : s.rate >= 70 ? 'bg-warning' : 'bg-destructive')} style={{ width: `${s.rate}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'Schedule' && <ScheduleCard day="Today — Monday" items={scheduleItems} />}
-
-      {activeTab === 'Evaluations' && (
-        <div className="space-y-6">
-          {/* Upcoming */}
-          <div>
-            <SectionHeader title="Upcoming" subtitle={`${evaluations.filter(e => e.status === 'upcoming').length} evaluations`} />
-            <div className="mt-3 space-y-2">
-              {evaluations.filter(e => e.status === 'upcoming').map((e, i) => (
-                <div key={i} className="rounded-xl border border-warning/20 bg-warning/5 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-warning/10">
-                        <Target className="h-4 w-4 text-warning" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">{e.title}</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">{e.subject} · {e.type}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">{e.date} · {e.time} · {e.room}</p>
-                      </div>
-                    </div>
-                    <span className="shrink-0 rounded-md bg-warning/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-warning">Weight: {e.weight}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Completed */}
-          <div>
-            <SectionHeader title="Completed" />
-            <div className="mt-3 space-y-2">
-              {evaluations.filter(e => e.status === 'completed').map((e, i) => (
-                <div key={i} className="rounded-xl border border-border bg-card p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success/10">
-                        <CheckCircle className="h-4 w-4 text-success" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">{e.title}</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">{e.subject} · {e.date}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-heading text-sm font-bold text-success">{e.grade}</span>
-                      <p className="text-[10px] text-muted-foreground">Weight: {e.weight}</p>
+          {activeTab === 'Attendance' && (
+            <div className="space-y-6">
+              <div className="rounded-2xl border border-border bg-card p-5">
+                <SectionHeader title="Overall Attendance" />
+                <div className="mt-6 flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
+                  <div className="relative h-36 w-36">
+                    <svg className="h-full w-full -rotate-90" viewBox="0 0 120 120">
+                      <circle cx="60" cy="60" r="50" fill="none" stroke="hsl(var(--muted))" strokeWidth="10" />
+                      <circle cx="60" cy="60" r="50" fill="none" stroke="hsl(var(--success))" strokeWidth="10" strokeLinecap="round" strokeDasharray={`${attendanceData.present * 3.14} ${100 * 3.14}`} />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="font-heading text-2xl font-bold text-foreground">{attendanceData.present}%</span>
+                      <span className="text-xs text-muted-foreground">Present</span>
                     </div>
                   </div>
+                  <div className="grid grid-cols-3 gap-6 text-center">
+                    <div><p className="font-heading text-lg font-bold text-success">{attendanceData.present}%</p><p className="text-xs text-muted-foreground">Present</p></div>
+                    <div><p className="font-heading text-lg font-bold text-destructive">{attendanceData.absent}%</p><p className="text-xs text-muted-foreground">Absent</p></div>
+                    <div><p className="font-heading text-lg font-bold text-warning">{attendanceData.late}%</p><p className="text-xs text-muted-foreground">Late</p></div>
+                  </div>
                 </div>
-              ))}
+              </div>
+
+              <div className="rounded-2xl border border-border bg-card p-5">
+                <SectionHeader title="By Subject" />
+                <div className="mt-4 space-y-3">
+                  {attendanceBySubject.map(s => (
+                    <div key={s.subject}>
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="font-medium text-foreground">{s.subject}</span>
+                        <span className={cn('font-bold', s.rate >= 80 ? 'text-success' : s.rate >= 70 ? 'text-warning' : 'text-destructive')}>{s.rate}%</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                        <div className={cn('h-full rounded-full transition-all duration-700', s.rate >= 80 ? 'bg-success' : s.rate >= 70 ? 'bg-warning' : 'bg-destructive')} style={{ width: `${s.rate}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          )}
+
+          {activeTab === 'Schedule' && <ScheduleCard day="Today — Monday" items={scheduleItems} />}
+
+          {activeTab === 'Evaluations' && (
+            <div className="space-y-6">
+              <div>
+                <SectionHeader title="Upcoming" subtitle={`${evaluations.filter(e => e.status === 'upcoming').length} evaluations`} />
+                <div className="mt-3 space-y-2">
+                  {evaluations.filter(e => e.status === 'upcoming').map((e, i) => (
+                    <div key={i} className="rounded-xl border border-warning/20 bg-warning/5 p-4 transition-all hover:shadow-sm">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-warning/10">
+                            <Target className="h-4 w-4 text-warning" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">{e.title}</p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">{e.subject} · {e.type}</p>
+                            <p className="mt-1 text-xs text-muted-foreground">{e.date} · {e.time} · {e.room}</p>
+                          </div>
+                        </div>
+                        <span className="shrink-0 rounded-md bg-warning/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-warning">Weight: {e.weight}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <SectionHeader title="Completed" />
+                <div className="mt-3 space-y-2">
+                  {evaluations.filter(e => e.status === 'completed').map((e, i) => (
+                    <div key={i} className="rounded-xl border border-border bg-card p-4 transition-all hover:shadow-sm">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success/10">
+                            <CheckCircle className="h-4 w-4 text-success" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">{e.title}</p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">{e.subject} · {e.date}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-heading text-sm font-bold text-success">{e.grade}</span>
+                          <p className="text-[10px] text-muted-foreground">Weight: {e.weight}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </PageContainer>
   );

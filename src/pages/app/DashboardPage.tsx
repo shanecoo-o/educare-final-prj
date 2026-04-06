@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, BookOpen, UserCheck, Wallet, Plus, FileText, ClipboardList, UserPlus, TrendingUp, AlertTriangle, Bell } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
@@ -8,6 +9,7 @@ import { AlertCard } from '@/components/dashboard/AlertCard';
 import { QuickActionCard } from '@/components/dashboard/QuickActionCard';
 import { FeedPreviewCard } from '@/components/dashboard/FeedPreviewCard';
 import { FinanceSummaryCard } from '@/components/dashboard/FinanceSummaryCard';
+import { LoadingState } from '@/components/states/LoadingState';
 import campusHero from '@/assets/campus-hero.jpg';
 
 const stats = [
@@ -49,6 +51,31 @@ const teachers = [
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 600);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <div className="space-y-6">
+          <div className="h-40 rounded-2xl bg-muted animate-pulse md:h-48" />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="rounded-2xl border border-border bg-card p-5 animate-pulse space-y-3">
+                <div className="h-3 w-1/3 rounded bg-muted" />
+                <div className="h-6 w-1/2 rounded bg-muted" />
+              </div>
+            ))}
+          </div>
+          <LoadingState variant="list" cards={2} />
+        </div>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
@@ -116,13 +143,13 @@ export default function DashboardPage() {
               action={
                 <div className="flex gap-1.5">
                   <button className="rounded-lg bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">All Time</button>
-                  <button className="rounded-lg bg-surface-dark px-3 py-1 text-xs font-medium text-surface-dark-foreground/60 border border-surface-dark-foreground/10">This year</button>
+                  <button className="rounded-lg bg-surface-dark px-3 py-1 text-xs font-medium text-surface-dark-foreground/60 border border-surface-dark-foreground/10 hover:border-surface-dark-foreground/20 transition-colors">This year</button>
                 </div>
               }
             />
             <div className="mt-4 space-y-3">
               {teachers.map((t) => (
-                <div key={t.name} className="flex items-center justify-between rounded-xl px-1 py-2">
+                <div key={t.name} className="flex items-center justify-between rounded-xl px-1 py-2 transition-colors hover:bg-surface-dark-foreground/5">
                   <div className="flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-dark-foreground/10 text-sm font-semibold text-surface-dark-foreground">{t.name[0]}</div>
                     <div>
@@ -172,7 +199,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex flex-wrap gap-1">
             {Array.from({ length: 28 }).map((_, i) => (
-              <div key={i} className={`h-3 w-3 rounded-full ${i < 16 ? 'bg-primary' : 'bg-primary/20'}`} />
+              <div key={i} className={`h-3 w-3 rounded-full transition-colors ${i < 16 ? 'bg-primary' : 'bg-primary/20'}`} />
             ))}
           </div>
         </div>
