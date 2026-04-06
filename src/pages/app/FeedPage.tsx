@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { Newspaper, GraduationCap, Wallet, Megaphone, Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { SectionHeader } from '@/components/ui/section-header';
+import { CategoryPill } from '@/components/knowledge/CategoryPill';
+import { EmptyState } from '@/components/states/EmptyState';
 import { cn } from '@/lib/utils';
 
 interface FeedItem {
@@ -11,6 +14,7 @@ interface FeedItem {
   time: string;
   variant: 'academic' | 'finance' | 'institutional';
   actionLabel?: string;
+  link?: string;
 }
 
 const variantStyles = {
@@ -20,16 +24,25 @@ const variantStyles = {
 };
 
 const feedItems: FeedItem[] = [
-  { icon: GraduationCap, category: 'Academic', title: 'New grades published', description: 'Midterm grades for Mathematics II have been released. Check your academic dashboard.', time: '2 hours ago', variant: 'academic', actionLabel: 'View Grades' },
-  { icon: Wallet, category: 'Finance', title: 'Payment confirmed', description: 'Your tuition payment of $2,400 for Term 1 has been validated and a receipt is available.', time: '4 hours ago', variant: 'finance', actionLabel: 'View Receipt' },
+  { icon: GraduationCap, category: 'Academic', title: 'New grades published', description: 'Midterm grades for Mathematics II have been released. Check your academic dashboard.', time: '2 hours ago', variant: 'academic', actionLabel: 'View Grades', link: '/app/academic' },
+  { icon: Wallet, category: 'Finance', title: 'Payment confirmed', description: 'Your tuition payment of $2,400 for Term 1 has been validated and a receipt is available.', time: '4 hours ago', variant: 'finance', actionLabel: 'View Receipt', link: '/app/finance' },
   { icon: Megaphone, category: 'Notice', title: 'Annual Day celebration', description: 'We are pleased to announce the Annual Day celebration on September 15, 2025. All students and faculty are invited.', time: '1 day ago', variant: 'institutional' },
-  { icon: GraduationCap, category: 'Academic', title: 'New content available', description: 'Prof. Alex John uploaded new study materials for Physics — Newton\'s Laws Explained.', time: '1 day ago', variant: 'academic', actionLabel: 'View Content' },
+  { icon: GraduationCap, category: 'Academic', title: 'New content available', description: 'Prof. Alex John uploaded new study materials for Physics — Newton\'s Laws Explained.', time: '1 day ago', variant: 'academic', actionLabel: 'View Content', link: '/app/knowledge' },
   { icon: Calendar, category: 'Academic', title: 'Schedule update', description: 'Biology class on Thursday has been rescheduled to 3:00 PM in Room 302.', time: '2 days ago', variant: 'academic' },
-  { icon: Wallet, category: 'Finance', title: 'Payment reminder', description: 'Lab Fee for Chemistry ($150) is due on June 30, 2025. Please make timely payment.', time: '3 days ago', variant: 'finance', actionLabel: 'Pay Now' },
+  { icon: Wallet, category: 'Finance', title: 'Payment reminder', description: 'Lab Fee for Chemistry ($150) is due on June 30, 2025. Please make timely payment.', time: '3 days ago', variant: 'finance', actionLabel: 'Pay Now', link: '/app/finance' },
   { icon: Megaphone, category: 'Notice', title: 'Library hours extended', description: 'The library will now remain open until 9:00 PM on weekdays during exam season.', time: '4 days ago', variant: 'institutional' },
 ];
 
+const filters = ['All', 'Academic', 'Finance', 'Institutional'];
+
 export default function FeedPage() {
+  const [activeFilter, setActiveFilter] = useState('All');
+  const navigate = useNavigate();
+
+  const filtered = activeFilter === 'All'
+    ? feedItems
+    : feedItems.filter(f => f.category.toLowerCase() === activeFilter.toLowerCase() || (activeFilter === 'Institutional' && f.category === 'Notice'));
+
   return (
     <PageContainer>
       <div className="mb-6">
@@ -37,8 +50,14 @@ export default function FeedPage() {
         <p className="mt-1 text-sm text-muted-foreground">Announcements, updates, and news from your institution.</p>
       </div>
 
+      <div className="mb-6 flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
+        {filters.map(f => (
+          <CategoryPill key={f} label={f} active={activeFilter === f} onClick={() => setActiveFilter(f)} />
+        ))}
+      </div>
+
       <div className="space-y-3">
-        {feedItems.map((item, i) => {
+        {filtered.map((item, i) => {
           const Icon = item.icon;
           return (
             <div key={i} className="rounded-2xl border border-border bg-card p-5 transition-all hover:shadow-sm">
@@ -56,13 +75,21 @@ export default function FeedPage() {
                   </div>
                   <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">{item.description}</p>
                   {item.actionLabel && (
-                    <button className="mt-3 text-xs font-medium text-primary hover:underline">{item.actionLabel}</button>
+                    <button
+                      onClick={() => item.link && navigate(item.link)}
+                      className="mt-3 text-xs font-medium text-primary hover:underline"
+                    >
+                      {item.actionLabel} →
+                    </button>
                   )}
                 </div>
               </div>
             </div>
           );
         })}
+        {filtered.length === 0 && (
+          <EmptyState icon={Newspaper} title="No updates" description="No items match the selected filter." />
+        )}
       </div>
     </PageContainer>
   );

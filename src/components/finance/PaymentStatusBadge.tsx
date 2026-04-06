@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 
-export type PaymentStatus = 'paid' | 'pending' | 'overdue' | 'due_soon' | 'partial' | 'validated' | 'under_review';
+export type PaymentStatus = 'paid' | 'pending' | 'overdue' | 'due_soon' | 'partial' | 'validated' | 'under_review' | 'rejected';
 
 const styles: Record<PaymentStatus, string> = {
   paid: 'bg-success/10 text-success',
@@ -10,6 +10,7 @@ const styles: Record<PaymentStatus, string> = {
   partial: 'bg-info/10 text-info',
   under_review: 'bg-info/10 text-info',
   overdue: 'bg-destructive/10 text-destructive',
+  rejected: 'bg-destructive/10 text-destructive',
 };
 
 const labels: Record<PaymentStatus, string> = {
@@ -20,6 +21,7 @@ const labels: Record<PaymentStatus, string> = {
   partial: 'Partial',
   under_review: 'Under Review',
   overdue: 'Overdue',
+  rejected: 'Rejected',
 };
 
 interface PaymentStatusBadgeProps {
