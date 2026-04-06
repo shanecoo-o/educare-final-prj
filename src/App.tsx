@@ -11,12 +11,12 @@ import LandingPage from "@/pages/public/LandingPage";
 import LoginPage from "@/pages/auth/LoginPage";
 import DashboardPage from "@/pages/app/DashboardPage";
 import AcademicPage from "@/pages/app/AcademicPage";
+import FinancePage from "@/pages/app/FinancePage";
+import KnowledgePage from "@/pages/app/KnowledgePage";
+import ChatPage from "@/pages/app/ChatPage";
+import FeedPage from "@/pages/app/FeedPage";
+import NotificationsPage from "@/pages/app/NotificationsPage";
 import {
-  FinancePage,
-  KnowledgePage,
-  ChatPage,
-  FeedPage,
-  NotificationsPage,
   SettingsPage,
   MenuPage,
 } from "@/pages/app/PlaceholderPages";
@@ -56,7 +56,6 @@ const App = () => (
             <Route path="menu" element={<MenuPage />} />
             <Route path="search" element={<DashboardPage />} />
             <Route path="profile" element={<SettingsPage />} />
-            {/* Role domain areas - structural placeholders */}
             <Route path="student/*" element={<DashboardPage />} />
             <Route path="teacher/*" element={<DashboardPage />} />
             <Route path="guardian/*" element={<DashboardPage />} />
