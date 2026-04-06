@@ -16,10 +16,9 @@ import KnowledgePage from "@/pages/app/KnowledgePage";
 import ChatPage from "@/pages/app/ChatPage";
 import FeedPage from "@/pages/app/FeedPage";
 import NotificationsPage from "@/pages/app/NotificationsPage";
-import {
-  SettingsPage,
-  MenuPage,
-} from "@/pages/app/PlaceholderPages";
+import SettingsPage from "@/pages/app/SettingsPage";
+import { MenuPage } from "@/pages/app/PlaceholderPages";
+import { StudentDashboard, TeacherDashboard, GuardianDashboard, FinanceAdminDashboard } from "@/pages/app/RoleDashboards";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,10 +55,11 @@ const App = () => (
             <Route path="menu" element={<MenuPage />} />
             <Route path="search" element={<DashboardPage />} />
             <Route path="profile" element={<SettingsPage />} />
-            <Route path="student/*" element={<DashboardPage />} />
-            <Route path="teacher/*" element={<DashboardPage />} />
-            <Route path="guardian/*" element={<DashboardPage />} />
-            <Route path="admin/*" element={<DashboardPage />} />
+            {/* Role-specific dashboards */}
+            <Route path="student/*" element={<StudentDashboard />} />
+            <Route path="teacher/*" element={<TeacherDashboard />} />
+            <Route path="guardian/*" element={<GuardianDashboard />} />
+            <Route path="admin/*" element={<FinanceAdminDashboard />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

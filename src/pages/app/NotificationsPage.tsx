@@ -1,24 +1,27 @@
 import { useState } from 'react';
 import { GraduationCap, Wallet, Bell as BellIcon, MessageCircle, Megaphone, CheckCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { NotificationItem } from '@/components/notifications/NotificationItem';
 import { CategoryPill } from '@/components/knowledge/CategoryPill';
+import { EmptyState } from '@/components/states/EmptyState';
 
 const filters = ['All', 'Academic', 'Finance', 'Communication', 'Institutional'];
 
 const notifications = [
-  { icon: GraduationCap, title: 'New grade published', description: 'Your Midterm Exam grade for Mathematics II is now available: 18/20.', time: '2h ago', type: 'academic' as const, read: false, actionLabel: 'View Grade' },
-  { icon: Wallet, title: 'Payment due soon', description: 'Lab Fee — Chemistry ($150) is due on June 30. Pay now to avoid late fees.', time: '4h ago', type: 'finance' as const, read: false, actionLabel: 'Pay Now' },
-  { icon: GraduationCap, title: 'New content available', description: 'Newton\'s Laws Explained video has been added to Physics knowledge space.', time: '1d ago', type: 'academic' as const, read: false, actionLabel: 'View' },
-  { icon: CheckCircle, title: 'Payment validated', description: 'Your tuition payment of $2,400 for Term 1 has been validated. Receipt available.', time: '1d ago', type: 'finance' as const, read: true, actionLabel: 'Download Receipt' },
-  { icon: MessageCircle, title: 'New message from Dr. Smith', description: 'Homework deadline extended to Friday, June 20th.', time: '1d ago', type: 'communication' as const, read: true },
+  { icon: GraduationCap, title: 'New grade published', description: 'Your Midterm Exam grade for Mathematics II is now available: 18/20.', time: '2h ago', type: 'academic' as const, read: false, actionLabel: 'View Grade', link: '/app/academic' },
+  { icon: Wallet, title: 'Payment due soon', description: 'Lab Fee — Chemistry ($150) is due on June 30. Pay now to avoid late fees.', time: '4h ago', type: 'finance' as const, read: false, actionLabel: 'Pay Now', link: '/app/finance' },
+  { icon: GraduationCap, title: 'New content available', description: 'Newton\'s Laws Explained video has been added to Physics knowledge space.', time: '1d ago', type: 'academic' as const, read: false, actionLabel: 'View', link: '/app/knowledge' },
+  { icon: CheckCircle, title: 'Payment validated', description: 'Your tuition payment of $2,400 for Term 1 has been validated. Receipt available.', time: '1d ago', type: 'finance' as const, read: true, actionLabel: 'Download Receipt', link: '/app/finance' },
+  { icon: MessageCircle, title: 'New message from Dr. Smith', description: 'Homework deadline extended to Friday, June 20th.', time: '1d ago', type: 'communication' as const, read: true, link: '/app/chat' },
   { icon: Megaphone, title: 'Institutional notice', description: 'Annual Day celebration announced for September 15, 2025.', time: '2d ago', type: 'institutional' as const, read: true },
-  { icon: GraduationCap, title: 'Schedule change', description: 'Biology class on Thursday rescheduled to 3:00 PM, Room 302.', time: '2d ago', type: 'academic' as const, read: true },
-  { icon: Wallet, title: 'Library fine', description: 'You have an outstanding library fine of $25. Please settle it at the finance office.', time: '5d ago', type: 'finance' as const, read: true, actionLabel: 'View Details' },
+  { icon: GraduationCap, title: 'Schedule change', description: 'Biology class on Thursday rescheduled to 3:00 PM, Room 302.', time: '2d ago', type: 'academic' as const, read: true, link: '/app/academic' },
+  { icon: Wallet, title: 'Library fine', description: 'You have an outstanding library fine of $25. Please settle it at the finance office.', time: '5d ago', type: 'finance' as const, read: true, actionLabel: 'View Details', link: '/app/finance' },
 ];
 
 export default function NotificationsPage() {
   const [activeFilter, setActiveFilter] = useState('All');
+  const navigate = useNavigate();
 
   const filtered = activeFilter === 'All'
     ? notifications
@@ -43,9 +46,15 @@ export default function NotificationsPage() {
       </div>
 
       <div className="space-y-1 rounded-2xl border border-border bg-card overflow-hidden">
-        {filtered.map((n, i) => <NotificationItem key={i} {...n} />)}
+        {filtered.map((n, i) => (
+          <NotificationItem
+            key={i}
+            {...n}
+            onAction={n.link ? () => navigate(n.link!) : undefined}
+          />
+        ))}
         {filtered.length === 0 && (
-          <div className="py-12 text-center text-sm text-muted-foreground">No notifications in this category.</div>
+          <EmptyState icon={BellIcon} title="No notifications" description="No notifications in this category." className="py-12" />
         )}
       </div>
     </PageContainer>
