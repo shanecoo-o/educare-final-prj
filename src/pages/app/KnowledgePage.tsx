@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { Search, BookOpen, FileText, Video, Link2, Filter, FolderOpen } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, BookOpen, FileText, Video, Link2, FolderOpen } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { SectionHeader } from '@/components/ui/section-header';
 import { ContentCard } from '@/components/knowledge/ContentCard';
 import { CategoryPill } from '@/components/knowledge/CategoryPill';
 import { EmptyState } from '@/components/states/EmptyState';
+import { LoadingState } from '@/components/states/LoadingState';
 
 const categories = ['All', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'Computer Science'];
 
@@ -31,6 +32,13 @@ export default function KnowledgePage() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [query, setQuery] = useState('');
   const [view, setView] = useState<'resources' | 'modules'>('resources');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    const t = setTimeout(() => setLoading(false), 350);
+    return () => clearTimeout(t);
+  }, [activeCategory, view]);
 
   const filtered = resources.filter(r => {
     const matchCat = activeCategory === 'All' || r.subject.toLowerCase().includes(activeCategory.toLowerCase());
@@ -52,7 +60,6 @@ export default function KnowledgePage() {
         <p className="mt-1 text-sm text-muted-foreground">Resources, learning materials, and digital content for your courses.</p>
       </div>
 
-      {/* Search */}
       <div className="mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -66,92 +73,94 @@ export default function KnowledgePage() {
         </div>
       </div>
 
-      {/* Categories */}
       <div className="mb-6 flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
         {categories.map(c => (
           <CategoryPill key={c} label={c} active={activeCategory === c} onClick={() => setActiveCategory(c)} />
         ))}
       </div>
 
-      {/* View toggle */}
       <div className="mb-6 flex items-center gap-2">
         <button
           onClick={() => setView('resources')}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${view === 'resources' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
+          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors active:scale-95 ${view === 'resources' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
         >
           Resources
         </button>
         <button
           onClick={() => setView('modules')}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${view === 'modules' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
+          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors active:scale-95 ${view === 'modules' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
         >
           Modules
         </button>
       </div>
 
-      {view === 'resources' && (
+      {loading ? (
+        <LoadingState variant={view === 'modules' ? 'list' : 'cards'} cards={view === 'modules' ? 4 : 6} />
+      ) : (
         <>
-          {/* Stats */}
-          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div className="rounded-xl border border-border bg-card p-3 text-center">
-              <FileText className="mx-auto h-4 w-4 text-info" />
-              <p className="mt-1 font-heading text-lg font-bold text-foreground">{typeStats.documents}</p>
-              <p className="text-[10px] text-muted-foreground">Documents</p>
-            </div>
-            <div className="rounded-xl border border-border bg-card p-3 text-center">
-              <Video className="mx-auto h-4 w-4 text-destructive" />
-              <p className="mt-1 font-heading text-lg font-bold text-foreground">{typeStats.videos}</p>
-              <p className="text-[10px] text-muted-foreground">Videos</p>
-            </div>
-            <div className="rounded-xl border border-border bg-card p-3 text-center">
-              <BookOpen className="mx-auto h-4 w-4 text-success" />
-              <p className="mt-1 font-heading text-lg font-bold text-foreground">{typeStats.exercises}</p>
-              <p className="text-[10px] text-muted-foreground">Exercises</p>
-            </div>
-            <div className="rounded-xl border border-border bg-card p-3 text-center">
-              <Link2 className="mx-auto h-4 w-4 text-warning" />
-              <p className="mt-1 font-heading text-lg font-bold text-foreground">{typeStats.links}</p>
-              <p className="text-[10px] text-muted-foreground">Links</p>
-            </div>
-          </div>
-
-          {/* Content grid */}
-          <SectionHeader title={activeCategory === 'All' ? 'All Resources' : activeCategory} subtitle={`${filtered.length} items`} />
-          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((r, i) => <ContentCard key={i} {...r} />)}
-          </div>
-
-          {filtered.length === 0 && (
-            <EmptyState icon={Search} title="No resources found" description="Try adjusting your search or filter." />
-          )}
-        </>
-      )}
-
-      {view === 'modules' && (
-        <div className="space-y-3">
-          {modules.map(m => (
-            <div key={m.subject} className="rounded-2xl border border-border bg-card p-5 transition-all hover:shadow-md hover:border-primary/20 cursor-pointer">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                  <FolderOpen className="h-4 w-4 text-primary" />
+          {view === 'resources' && (
+            <>
+              <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-xl border border-border bg-card p-3 text-center transition-all hover:shadow-sm">
+                  <FileText className="mx-auto h-4 w-4 text-info" />
+                  <p className="mt-1 font-heading text-lg font-bold text-foreground">{typeStats.documents}</p>
+                  <p className="text-[10px] text-muted-foreground">Documents</p>
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-heading text-sm font-semibold text-foreground">{m.subject}</h3>
-                  <p className="text-xs text-muted-foreground">{m.topics} topics · {m.resources} resources</p>
-                  <div className="mt-3">
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-muted-foreground">Progress</span>
-                      <span className="font-medium text-foreground">{m.progress}%</span>
+                <div className="rounded-xl border border-border bg-card p-3 text-center transition-all hover:shadow-sm">
+                  <Video className="mx-auto h-4 w-4 text-destructive" />
+                  <p className="mt-1 font-heading text-lg font-bold text-foreground">{typeStats.videos}</p>
+                  <p className="text-[10px] text-muted-foreground">Videos</p>
+                </div>
+                <div className="rounded-xl border border-border bg-card p-3 text-center transition-all hover:shadow-sm">
+                  <BookOpen className="mx-auto h-4 w-4 text-success" />
+                  <p className="mt-1 font-heading text-lg font-bold text-foreground">{typeStats.exercises}</p>
+                  <p className="text-[10px] text-muted-foreground">Exercises</p>
+                </div>
+                <div className="rounded-xl border border-border bg-card p-3 text-center transition-all hover:shadow-sm">
+                  <Link2 className="mx-auto h-4 w-4 text-warning" />
+                  <p className="mt-1 font-heading text-lg font-bold text-foreground">{typeStats.links}</p>
+                  <p className="text-[10px] text-muted-foreground">Links</p>
+                </div>
+              </div>
+
+              <SectionHeader title={activeCategory === 'All' ? 'All Resources' : activeCategory} subtitle={`${filtered.length} items`} />
+              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {filtered.map((r, i) => <ContentCard key={i} {...r} />)}
+              </div>
+
+              {filtered.length === 0 && (
+                <EmptyState icon={Search} title="No resources found" description="Try adjusting your search or filter." />
+              )}
+            </>
+          )}
+
+          {view === 'modules' && (
+            <div className="space-y-3">
+              {modules.map(m => (
+                <div key={m.subject} className="rounded-2xl border border-border bg-card p-5 transition-all hover:shadow-md hover:border-primary/20 cursor-pointer active:scale-[0.998]">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                      <FolderOpen className="h-4 w-4 text-primary" />
                     </div>
-                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                      <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${m.progress}%` }} />
+                    <div className="flex-1">
+                      <h3 className="font-heading text-sm font-semibold text-foreground">{m.subject}</h3>
+                      <p className="text-xs text-muted-foreground">{m.topics} topics · {m.resources} resources</p>
+                      <div className="mt-3">
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span className="text-muted-foreground">Progress</span>
+                          <span className="font-medium text-foreground">{m.progress}%</span>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                          <div className="h-full rounded-full bg-primary transition-all duration-700" style={{ width: `${m.progress}%` }} />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </PageContainer>
   );

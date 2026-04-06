@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Bell, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CommandSearch } from '@/components/search/CommandSearch';
@@ -10,6 +11,7 @@ interface AppTopbarProps {
 
 export function AppTopbar({ sidebarCollapsed, pageTitle }: AppTopbarProps) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -42,10 +44,10 @@ export function AppTopbar({ sidebarCollapsed, pageTitle }: AppTopbarProps) {
         <div className="hidden md:flex max-w-md flex-1 mx-8">
           <button
             onClick={() => setSearchOpen(true)}
-            className="relative w-full text-left"
+            className="relative w-full text-left group"
           >
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <div className="w-full rounded-xl border border-border bg-muted/50 py-2 pl-10 pr-4 text-sm text-muted-foreground">
+            <div className="w-full rounded-xl border border-border bg-muted/50 py-2 pl-10 pr-4 text-sm text-muted-foreground group-hover:border-primary/20 transition-colors">
               Search anything...
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex h-5 items-center gap-1 rounded border border-border bg-card px-1.5 text-[10px] font-medium text-muted-foreground">⌘K</kbd>
             </div>
@@ -53,14 +55,20 @@ export function AppTopbar({ sidebarCollapsed, pageTitle }: AppTopbarProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <button onClick={() => setSearchOpen(true)} className="relative flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted transition-colors md:hidden">
+          <button onClick={() => setSearchOpen(true)} className="relative flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted transition-colors active:scale-90 md:hidden">
             <Search className="h-[18px] w-[18px]" />
           </button>
-          <button className="relative flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted transition-colors">
+          <button
+            onClick={() => navigate('/app/notifications')}
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted transition-colors active:scale-90"
+          >
             <Bell className="h-[18px] w-[18px]" />
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
           </button>
-          <button className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-accent">
+          <button
+            onClick={() => navigate('/app/settings')}
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-accent active:scale-90"
+          >
             <User className="h-[18px] w-[18px]" />
           </button>
         </div>

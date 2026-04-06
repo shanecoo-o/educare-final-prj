@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Send, ArrowLeft } from 'lucide-react';
+import { Search, Send, ArrowLeft, MessageCircle } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { ConversationList, type Conversation } from '@/components/chat/ConversationList';
 import { MessageBubble } from '@/components/chat/MessageBubble';
@@ -46,7 +46,7 @@ export default function ChatPage() {
 
   return (
     <PageContainer className="!p-0 h-[calc(100vh-var(--topbar-height)-var(--bottom-nav-height))] md:h-[calc(100vh-var(--topbar-height))]">
-      <div className="flex h-full">
+      <div className="flex h-full rounded-2xl border border-border overflow-hidden bg-card">
         {/* Conversation list */}
         <div className={cn(
           'w-full md:w-80 md:shrink-0 border-r border-border bg-card flex flex-col',
@@ -61,7 +61,7 @@ export default function ChatPage() {
                 placeholder="Search conversations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-border bg-muted/50 py-2 pl-9 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20"
+                className="w-full rounded-lg border border-border bg-muted/50 py-2 pl-9 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all"
               />
             </div>
           </div>
@@ -69,19 +69,18 @@ export default function ChatPage() {
             {filteredConversations.length > 0 ? (
               <ConversationList conversations={filteredConversations} activeId={activeConversation} onSelect={(id) => { setActiveConversation(id); setShowList(false); }} />
             ) : (
-              <div className="py-8 text-center text-xs text-muted-foreground">No conversations found</div>
+              <EmptyState icon={MessageCircle} title="No conversations" description="No conversations match your search." className="py-8" />
             )}
           </div>
         </div>
 
         {/* Message area */}
         <div className={cn(
-          'flex-1 flex flex-col',
+          'flex-1 flex flex-col bg-background/50',
           showList && 'hidden md:flex'
         )}>
-          {/* Header */}
-          <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-            <button onClick={() => setShowList(true)} className="md:hidden text-muted-foreground hover:text-foreground">
+          <div className="flex items-center gap-3 border-b border-border px-4 py-3 bg-card">
+            <button onClick={() => setShowList(true)} className="md:hidden text-muted-foreground hover:text-foreground transition-colors active:scale-90">
               <ArrowLeft className="h-4 w-4" />
             </button>
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-heading text-xs font-bold text-primary">
@@ -93,26 +92,24 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin">
             {messages.length > 0 ? (
               messages.map((m, i) => <MessageBubble key={i} {...m} />)
             ) : (
-              <EmptyState title="No messages yet" description="Start the conversation." className="h-full" />
+              <EmptyState icon={MessageCircle} title="No messages yet" description="Start the conversation by sending a message." className="h-full" />
             )}
           </div>
 
-          {/* Input */}
-          <div className="border-t border-border p-3">
+          <div className="border-t border-border p-3 bg-card">
             <div className="flex items-center gap-2">
               <input
                 type="text"
                 placeholder="Type a message..."
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
-                className="flex-1 rounded-xl border border-border bg-muted/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20"
+                className="flex-1 rounded-xl border border-border bg-muted/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all"
               />
-              <button className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+              <button className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors active:scale-95">
                 <Send className="h-4 w-4" />
               </button>
             </div>

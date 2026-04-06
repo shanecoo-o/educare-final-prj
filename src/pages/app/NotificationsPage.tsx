@@ -5,10 +5,11 @@ import { PageContainer } from '@/components/layout/PageContainer';
 import { NotificationItem } from '@/components/notifications/NotificationItem';
 import { CategoryPill } from '@/components/knowledge/CategoryPill';
 import { EmptyState } from '@/components/states/EmptyState';
+import { toast } from 'sonner';
 
 const filters = ['All', 'Academic', 'Finance', 'Communication', 'Institutional'];
 
-const notifications = [
+const initialNotifications = [
   { icon: GraduationCap, title: 'New grade published', description: 'Your Midterm Exam grade for Mathematics II is now available: 18/20.', time: '2h ago', type: 'academic' as const, read: false, actionLabel: 'View Grade', link: '/app/academic' },
   { icon: Wallet, title: 'Payment due soon', description: 'Lab Fee — Chemistry ($150) is due on June 30. Pay now to avoid late fees.', time: '4h ago', type: 'finance' as const, read: false, actionLabel: 'Pay Now', link: '/app/finance' },
   { icon: GraduationCap, title: 'New content available', description: 'Newton\'s Laws Explained video has been added to Physics knowledge space.', time: '1d ago', type: 'academic' as const, read: false, actionLabel: 'View', link: '/app/knowledge' },
@@ -21,6 +22,7 @@ const notifications = [
 
 export default function NotificationsPage() {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [notifications, setNotifications] = useState(initialNotifications);
   const navigate = useNavigate();
 
   const filtered = activeFilter === 'All'
@@ -29,6 +31,11 @@ export default function NotificationsPage() {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    toast.success('All notifications marked as read');
+  };
+
   return (
     <PageContainer>
       <div className="mb-6 flex items-center justify-between">
@@ -36,7 +43,9 @@ export default function NotificationsPage() {
           <h1 className="font-heading text-2xl font-bold text-foreground">Notifications</h1>
           <p className="mt-1 text-sm text-muted-foreground">{unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}</p>
         </div>
-        <button className="text-xs font-medium text-primary hover:underline">Mark all read</button>
+        {unreadCount > 0 && (
+          <button onClick={markAllRead} className="text-xs font-medium text-primary hover:underline transition-colors active:scale-95">Mark all read</button>
+        )}
       </div>
 
       <div className="mb-6 flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
