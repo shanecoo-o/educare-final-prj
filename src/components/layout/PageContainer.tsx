@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface PageContainerProps {
@@ -8,8 +9,13 @@ interface PageContainerProps {
 
 export function PageContainer({ children, className }: PageContainerProps) {
   return (
-    <div className={cn('mx-auto max-w-7xl animate-fade-in', className)}>
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+      className={cn('mx-auto max-w-7xl', className)}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }

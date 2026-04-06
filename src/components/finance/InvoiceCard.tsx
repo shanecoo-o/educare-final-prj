@@ -31,7 +31,7 @@ export function InvoiceCard({ id, concept, amount, dueDate, status, student, pai
 
   return (
     <div className={cn(
-      'flex items-center gap-4 rounded-xl border bg-card px-4 py-3.5 transition-all hover:shadow-sm',
+      'flex items-center gap-4 rounded-xl border bg-card px-4 py-3.5 transition-all hover:shadow-sm active:scale-[0.995]',
       isUrgent ? 'border-destructive/20 hover:border-destructive/30' : 'border-border hover:border-primary/10'
     )}>
       <div className={cn(
@@ -51,14 +51,16 @@ export function InvoiceCard({ id, concept, amount, dueDate, status, student, pai
       </div>
       <div className="flex items-center gap-3 shrink-0">
         <div className="text-right">
-          <span className="font-heading text-sm font-bold text-foreground">{amount}</span>
+          <span className={cn('font-heading text-sm font-bold', isUrgent ? 'text-destructive' : 'text-foreground')}>{amount}</span>
         </div>
         <PaymentStatusBadge status={status} />
         {action && (
           <button className={cn(
-            'hidden sm:flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors',
+            'hidden sm:flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all active:scale-95',
             ['pending', 'due_soon', 'overdue', 'partial'].includes(status)
               ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+              : status === 'rejected'
+              ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
               : 'bg-muted text-foreground hover:bg-muted/80'
           )}>
             <action.icon className="h-3 w-3" />

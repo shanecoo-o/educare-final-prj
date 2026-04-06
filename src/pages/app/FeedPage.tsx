@@ -60,7 +60,14 @@ export default function FeedPage() {
         {filtered.map((item, i) => {
           const Icon = item.icon;
           return (
-            <div key={i} className="rounded-2xl border border-border bg-card p-5 transition-all hover:shadow-sm">
+            <div
+              key={i}
+              onClick={() => item.link && navigate(item.link)}
+              className={cn(
+                'rounded-2xl border border-border bg-card p-5 transition-all hover:shadow-sm hover:border-primary/10',
+                item.link && 'cursor-pointer active:scale-[0.995]'
+              )}
+            >
               <div className="flex items-start gap-3">
                 <div className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-xl', variantStyles[item.variant])}>
                   <Icon className="h-4 w-4" />
@@ -75,12 +82,9 @@ export default function FeedPage() {
                   </div>
                   <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">{item.description}</p>
                   {item.actionLabel && (
-                    <button
-                      onClick={() => item.link && navigate(item.link)}
-                      className="mt-3 text-xs font-medium text-primary hover:underline"
-                    >
+                    <span className="mt-3 inline-block text-xs font-medium text-primary">
                       {item.actionLabel} →
-                    </button>
+                    </span>
                   )}
                 </div>
               </div>

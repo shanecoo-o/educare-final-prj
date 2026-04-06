@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 interface FeedPreviewCardProps {
@@ -5,6 +6,7 @@ interface FeedPreviewCardProps {
   title: string;
   time: string;
   variant?: 'academic' | 'finance' | 'institutional';
+  link?: string;
 }
 
 const pillStyles = {
@@ -13,9 +15,14 @@ const pillStyles = {
   institutional: 'bg-info/10 text-info',
 };
 
-export function FeedPreviewCard({ category, title, time, variant = 'institutional' }: FeedPreviewCardProps) {
+export function FeedPreviewCard({ category, title, time, variant = 'institutional', link }: FeedPreviewCardProps) {
+  const navigate = useNavigate();
+
   return (
-    <div className="flex items-start gap-3 rounded-lg px-1 py-2.5">
+    <button
+      onClick={() => link && navigate(link)}
+      className="flex w-full items-start gap-3 rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-muted/50 active:scale-[0.99]"
+    >
       <div className={cn('mt-0.5 shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider', pillStyles[variant])}>
         {category}
       </div>
@@ -23,6 +30,6 @@ export function FeedPreviewCard({ category, title, time, variant = 'institutiona
         <p className="text-sm font-medium text-foreground truncate">{title}</p>
         <p className="text-xs text-muted-foreground">{time}</p>
       </div>
-    </div>
+    </button>
   );
 }

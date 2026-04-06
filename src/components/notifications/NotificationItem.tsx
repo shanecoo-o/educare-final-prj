@@ -23,7 +23,14 @@ const typeStyles: Record<NotificationType, string> = {
 
 export function NotificationItem({ icon: Icon = GraduationCap, title, description, time, type, read, actionLabel, onAction }: NotificationItemProps) {
   return (
-    <div className={cn('flex items-start gap-3 rounded-xl px-4 py-3.5 transition-colors', !read && 'bg-primary/[0.02]')}>
+    <button
+      onClick={onAction}
+      className={cn(
+        'flex w-full items-start gap-3 rounded-xl px-4 py-3.5 text-left transition-colors hover:bg-muted/50 active:bg-muted/70',
+        !read && 'bg-primary/[0.03]',
+        !onAction && 'cursor-default'
+      )}
+    >
       <div className={cn('mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', typeStyles[type])}>
         <Icon className="h-4 w-4" />
       </div>
@@ -34,12 +41,12 @@ export function NotificationItem({ icon: Icon = GraduationCap, title, descriptio
         </div>
         <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
         {actionLabel && (
-          <button onClick={onAction} className="mt-2 text-xs font-medium text-primary hover:underline">
-            {actionLabel}
-          </button>
+          <span className="mt-2 inline-block text-xs font-medium text-primary">
+            {actionLabel} →
+          </span>
         )}
       </div>
       {!read && <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />}
-    </div>
+    </button>
   );
 }

@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Users, BookOpen, UserCheck, Wallet, Plus, FileText, ClipboardList, UserPlus, TrendingUp, AlertTriangle, Bell } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { SectionHeader } from '@/components/ui/section-header';
@@ -23,21 +24,21 @@ const events = [
 ];
 
 const alerts = [
-  { title: '3 payments overdue', description: 'Students with overdue tuition fees require attention.', variant: 'destructive' as const, action: 'Review' },
-  { title: 'Term report pending', description: 'Academic reports for Term 2 are due in 5 days.', variant: 'warning' as const, action: 'View' },
+  { title: '3 payments overdue', description: 'Students with overdue tuition fees require attention.', variant: 'destructive' as const, action: 'Review', link: '/app/finance' },
+  { title: 'Term report pending', description: 'Academic reports for Term 2 are due in 5 days.', variant: 'warning' as const, action: 'View', link: '/app/academic' },
 ];
 
 const feedItems = [
-  { category: 'Academic', title: 'New grades published for Mathematics II', time: '2h ago', variant: 'academic' as const },
-  { category: 'Finance', title: 'Tuition batch payment validated', time: '4h ago', variant: 'finance' as const },
-  { category: 'Notice', title: 'Annual Day celebration on September 15', time: '1d ago', variant: 'institutional' as const },
+  { category: 'Academic', title: 'New grades published for Mathematics II', time: '2h ago', variant: 'academic' as const, link: '/app/academic' },
+  { category: 'Finance', title: 'Tuition batch payment validated', time: '4h ago', variant: 'finance' as const, link: '/app/finance' },
+  { category: 'Notice', title: 'Annual Day celebration on September 15', time: '1d ago', variant: 'institutional' as const, link: '/app/feed' },
 ];
 
 const quickActions = [
-  { icon: UserPlus, label: 'Add Student' },
-  { icon: ClipboardList, label: 'New Evaluation' },
-  { icon: FileText, label: 'Reports' },
-  { icon: Plus, label: 'New Content' },
+  { icon: UserPlus, label: 'Add Student', path: '/app/academic' },
+  { icon: ClipboardList, label: 'New Evaluation', path: '/app/academic' },
+  { icon: FileText, label: 'Reports', path: '/app/finance' },
+  { icon: Plus, label: 'New Content', path: '/app/knowledge' },
 ];
 
 const teachers = [
@@ -47,6 +48,8 @@ const teachers = [
 ];
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
+
   return (
     <PageContainer>
       {/* Hero banner */}
@@ -67,7 +70,9 @@ export default function DashboardPage() {
       {/* Alerts */}
       {alerts.length > 0 && (
         <div className="mb-6 space-y-2">
-          {alerts.map((a, i) => <AlertCard key={i} {...a} />)}
+          {alerts.map((a, i) => (
+            <AlertCard key={i} {...a} onAction={() => a.link && navigate(a.link)} />
+          ))}
         </div>
       )}
 
@@ -75,7 +80,9 @@ export default function DashboardPage() {
       <div className="mb-6">
         <SectionHeader title="Quick Actions" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {quickActions.map((qa) => <QuickActionCard key={qa.label} {...qa} />)}
+          {quickActions.map((qa) => (
+            <QuickActionCard key={qa.label} icon={qa.icon} label={qa.label} onClick={() => navigate(qa.path)} />
+          ))}
         </div>
       </div>
 
@@ -131,9 +138,9 @@ export default function DashboardPage() {
           {/* Recent Activity */}
           <div className="rounded-2xl border border-border bg-card p-5">
             <SectionHeader title="Recent Activity" action={
-              <button className="text-xs font-medium text-primary hover:underline">View Feed</button>
+              <button onClick={() => navigate('/app/feed')} className="text-xs font-medium text-primary hover:underline">View Feed</button>
             } />
-            <div className="mt-3 space-y-1">
+            <div className="mt-3 space-y-0.5">
               {feedItems.map((f, i) => <FeedPreviewCard key={i} {...f} />)}
             </div>
           </div>
@@ -147,7 +154,7 @@ export default function DashboardPage() {
           {/* Events */}
           <div className="rounded-2xl border border-border bg-card p-5">
             <SectionHeader title="Upcoming Events" subtitle="Scheduled events & tests" action={
-              <button className="rounded-lg border border-border px-3 py-1 text-xs font-medium text-foreground hover:bg-muted transition-colors">View All</button>
+              <button onClick={() => navigate('/app/academic')} className="rounded-lg border border-border px-3 py-1 text-xs font-medium text-foreground hover:bg-muted transition-colors">View All</button>
             } />
             <div className="mt-4 space-y-2.5">
               {events.map((e, i) => <EventCard key={i} date={e.date} title={e.title} />)}

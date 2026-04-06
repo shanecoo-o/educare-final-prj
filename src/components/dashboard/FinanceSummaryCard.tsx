@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Wallet, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface FinanceSummaryCardProps {
@@ -8,13 +9,21 @@ interface FinanceSummaryCardProps {
 }
 
 export function FinanceSummaryCard({ totalDue, paid, overdue, pending }: FinanceSummaryCardProps) {
+  const navigate = useNavigate();
+
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning/10">
-          <Wallet className="h-4 w-4 text-warning" />
+    <div
+      onClick={() => navigate('/app/finance')}
+      className="rounded-2xl border border-border bg-card p-5 transition-all hover:shadow-sm hover:border-primary/10 cursor-pointer active:scale-[0.99]"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning/10">
+            <Wallet className="h-4 w-4 text-warning" />
+          </div>
+          <h3 className="font-heading text-sm font-semibold text-foreground">Financial Summary</h3>
         </div>
-        <h3 className="font-heading text-sm font-semibold text-foreground">Financial Summary</h3>
+        <span className="text-xs font-medium text-primary">View →</span>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-xl bg-muted/50 p-3">

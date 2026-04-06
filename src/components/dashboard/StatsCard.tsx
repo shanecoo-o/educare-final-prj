@@ -30,7 +30,7 @@ export function StatsCard({
   return (
     <div
       className={cn(
-        'rounded-2xl p-5 transition-shadow hover:shadow-md',
+        'rounded-2xl p-5 transition-all hover:shadow-md active:scale-[0.98]',
         variantStyles[variant],
         className
       )}
@@ -47,7 +47,7 @@ export function StatsCard({
           </div>
           <p className="font-heading text-2xl font-bold text-foreground">{value}</p>
         </div>
-        <button className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted/50 text-muted-foreground hover:bg-muted transition-colors">
+        <button className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted/50 text-muted-foreground hover:bg-muted transition-colors active:scale-90">
           <ArrowUpRight className="h-4 w-4" />
         </button>
       </div>
