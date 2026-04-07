@@ -33,7 +33,7 @@ const typePills: Record<ContentType, string> = {
   link: 'bg-warning/10 text-warning',
 };
 
-export function ContentCard({ title, subject, type, date, author }: ContentCardProps) {
+export function ContentCard({ title, subject, type, date, author, module: moduleName }: ContentCardProps) {
   const Icon = typeIcons[type];
   return (
     <div className="rounded-2xl border border-border bg-card p-4 transition-all hover:shadow-md hover:border-primary/20 cursor-pointer">
