@@ -43,7 +43,7 @@ export function ContentCard({ title, subject, type, date, author, module: module
         </div>
         <div className="flex-1 min-w-0">
           <h4 className="text-sm font-medium text-foreground truncate">{title}</h4>
-          <p className="mt-0.5 text-xs text-muted-foreground">{subject} · {date}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{subject}{moduleName ? ` · ${moduleName}` : ''} · {date}</p>
           {author && <p className="text-xs text-muted-foreground">by {author}</p>}
         </div>
         <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase', typePills[type])}>
