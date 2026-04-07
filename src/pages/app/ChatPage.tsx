@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Send, ArrowLeft, MessageCircle } from 'lucide-react';
+import { Search, Send, ArrowLeft, MessageCircle, Phone, MoreVertical } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { ConversationList, type Conversation } from '@/components/chat/ConversationList';
 import { MessageBubble } from '@/components/chat/MessageBubble';
@@ -31,6 +31,21 @@ const messagesMap: Record<string, Array<{ content: string; time: string; sender:
   ],
 };
 
+const contextColors: Record<string, string> = {
+  Teacher: 'text-primary',
+  'Student Services': 'text-info',
+  'Class Group': 'text-warning',
+  Administrative: 'text-muted-foreground',
+};
+
+function getContextColor(context?: string) {
+  if (!context) return 'text-muted-foreground';
+  for (const [key, val] of Object.entries(contextColors)) {
+    if (context.includes(key)) return val;
+  }
+  return 'text-muted-foreground';
+}
+
 export default function ChatPage() {
   const [activeConversation, setActiveConversation] = useState('1');
   const [showList, setShowList] = useState(true);
@@ -54,6 +69,7 @@ export default function ChatPage() {
         )}>
           <div className="p-4 border-b border-border">
             <h2 className="font-heading text-lg font-bold text-foreground">Messages</h2>
+            <p className="text-xs text-muted-foreground">{conversations.filter(c => c.unread).length} unread conversations</p>
             <div className="mt-3 relative">
               <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <input
@@ -83,18 +99,35 @@ export default function ChatPage() {
             <button onClick={() => setShowList(true)} className="md:hidden text-muted-foreground hover:text-foreground transition-colors active:scale-90">
               <ArrowLeft className="h-4 w-4" />
             </button>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-heading text-xs font-bold text-primary">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 font-heading text-xs font-bold text-primary">
               {activeConvo?.name[0]}
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-foreground">{activeConvo?.name}</p>
-              {activeConvo?.context && <p className="text-[10px] text-muted-foreground">{activeConvo.context}</p>}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">{activeConvo?.name}</p>
+              {activeConvo?.context && (
+                <p className={cn('text-[10px] font-medium', getContextColor(activeConvo.context))}>
+                  {activeConvo.context}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              <button className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                <Phone className="h-3.5 w-3.5" />
+              </button>
+              <button className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                <MoreVertical className="h-3.5 w-3.5" />
+              </button>
             </div>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin">
             {messages.length > 0 ? (
-              messages.map((m, i) => <MessageBubble key={i} {...m} />)
+              <>
+                <div className="flex justify-center">
+                  <span className="rounded-full bg-muted px-3 py-1 text-[10px] text-muted-foreground">Today</span>
+                </div>
+                {messages.map((m, i) => <MessageBubble key={i} {...m} />)}
+              </>
             ) : (
               <EmptyState icon={MessageCircle} title="No messages yet" description="Start the conversation by sending a message." className="h-full" />
             )}
@@ -104,12 +137,18 @@ export default function ChatPage() {
             <div className="flex items-center gap-2">
               <input
                 type="text"
-                placeholder="Type a message..."
+                placeholder={`Message ${activeConvo?.name ?? ''}...`}
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && messageInput.trim() && setMessageInput('')}
                 className="flex-1 rounded-xl border border-border bg-muted/50 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all"
               />
-              <button className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors active:scale-95">
+              <button
+                className={cn(
+                  'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors active:scale-95',
+                  messageInput.trim() ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-muted text-muted-foreground'
+                )}
+              >
                 <Send className="h-4 w-4" />
               </button>
             </div>
