@@ -9,6 +9,7 @@ interface ContentCardProps {
   type: ContentType;
   date: string;
   author?: string;
+  module?: string;
 }
 
 const typeIcons: Record<ContentType, any> = {
