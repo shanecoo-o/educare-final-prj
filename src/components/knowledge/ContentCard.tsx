@@ -9,6 +9,7 @@ interface ContentCardProps {
   type: ContentType;
   date: string;
   author?: string;
+  module?: string;
 }
 
 const typeIcons: Record<ContentType, any> = {
@@ -32,7 +33,7 @@ const typePills: Record<ContentType, string> = {
   link: 'bg-warning/10 text-warning',
 };
 
-export function ContentCard({ title, subject, type, date, author }: ContentCardProps) {
+export function ContentCard({ title, subject, type, date, author, module: moduleName }: ContentCardProps) {
   const Icon = typeIcons[type];
   return (
     <div className="rounded-2xl border border-border bg-card p-4 transition-all hover:shadow-md hover:border-primary/20 cursor-pointer">
@@ -42,7 +43,7 @@ export function ContentCard({ title, subject, type, date, author }: ContentCardP
         </div>
         <div className="flex-1 min-w-0">
           <h4 className="text-sm font-medium text-foreground truncate">{title}</h4>
-          <p className="mt-0.5 text-xs text-muted-foreground">{subject} · {date}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{subject}{moduleName ? ` · ${moduleName}` : ''} · {date}</p>
           {author && <p className="text-xs text-muted-foreground">by {author}</p>}
         </div>
         <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase', typePills[type])}>

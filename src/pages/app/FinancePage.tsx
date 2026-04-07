@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Wallet, TrendingUp, AlertTriangle, CheckCircle, Receipt, CreditCard, FileText, Download, Clock, XCircle, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { Wallet, TrendingUp, AlertTriangle, CheckCircle, Receipt, CreditCard, FileText, Download, Clock, XCircle, ArrowUpRight, ArrowDownLeft, ChevronRight } from 'lucide-react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { SectionHeader } from '@/components/ui/section-header';
 import { InvoiceCard } from '@/components/finance/InvoiceCard';
 import { CategoryPill } from '@/components/knowledge/CategoryPill';
 import { EmptyState } from '@/components/states/EmptyState';
 import { LoadingState } from '@/components/states/LoadingState';
-import type { PaymentStatus } from '@/components/finance/PaymentStatusBadge';
+import { PaymentStatusBadge, type PaymentStatus } from '@/components/finance/PaymentStatusBadge';
+import { cn } from '@/lib/utils';
 
 const tabs = ['Overview', 'Obligations', 'Payments', 'Receipts'];
 
@@ -36,12 +37,19 @@ const financeItems: FinanceItem[] = [
   { id: 'PAY-2025-013', concept: 'Student Activity Fee', amount: '$200', dueDate: 'Mar 1, 2025', status: 'validated', paidDate: 'Feb 28, 2025', category: 'payment' },
 ];
 
-const summaryStats = {
-  totalDue: '$2,880',
-  totalPaid: '$3,100',
-  overdue: '$25',
-  pending: '$2,855',
-  validated: '$2,750',
+const timelineEvents = [
+  { date: 'Jun 30, 2025', label: 'Lab Fee — Chemistry due', type: 'upcoming' as const, amount: '$150' },
+  { date: 'Jun 1, 2025', label: 'Library Fine overdue', type: 'overdue' as const, amount: '$25' },
+  { date: 'Feb 28, 2025', label: 'Student Activity Fee paid', type: 'paid' as const, amount: '$200' },
+  { date: 'Feb 10, 2025', label: 'Lab Fee — Physics paid', type: 'paid' as const, amount: '$150' },
+  { date: 'Jan 12, 2025', label: 'Tuition Fee — Term 1 paid', type: 'paid' as const, amount: '$2,400' },
+  { date: 'Nov 28, 2024', label: 'Registration Fee paid', type: 'paid' as const, amount: '$350' },
+];
+
+const timelineDotColor = {
+  upcoming: 'bg-warning',
+  overdue: 'bg-destructive',
+  paid: 'bg-success',
 };
 
 export default function FinancePage() {
@@ -58,6 +66,9 @@ export default function FinancePage() {
   const obligations = financeItems.filter(i => i.category === 'obligation');
   const payments = financeItems.filter(i => i.category === 'payment');
   const receipts = financeItems.filter(i => ['validated'].includes(i.status));
+
+  const urgentItems = obligations.filter(o => o.status === 'overdue' || o.status === 'rejected');
+  const activeObligations = obligations.filter(o => !['paid', 'validated'].includes(o.status));
 
   const filteredObligations = statusFilter === 'all'
     ? obligations
@@ -82,87 +93,112 @@ export default function FinancePage() {
         <>
           {activeTab === 'Overview' && (
             <div className="space-y-6">
+              {/* Current Account */}
+              <div className="rounded-2xl bg-surface-dark p-5">
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-surface-dark-foreground/40">Current Account Balance</p>
+                    <p className="mt-1.5 font-heading text-3xl font-bold text-surface-dark-foreground">-$2,880<span className="text-lg">.00</span></p>
+                    <p className="mt-1 text-xs text-surface-dark-foreground/50">7 active obligations · 4 payments completed</p>
+                  </div>
+                  <button className="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors active:scale-[0.97]">
+                    <CreditCard className="mr-1.5 inline h-4 w-4" />Make Payment
+                  </button>
+                </div>
+                <div className="mt-5 grid grid-cols-2 gap-4 border-t border-surface-dark-foreground/10 pt-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-success/15">
+                      <ArrowDownLeft className="h-3.5 w-3.5 text-success" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-surface-dark-foreground/40">Last payment</p>
+                      <p className="text-sm font-semibold text-surface-dark-foreground">$200 <span className="font-normal text-surface-dark-foreground/50">· Feb 28</span></p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning/15">
+                      <ArrowUpRight className="h-3.5 w-3.5 text-warning" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-surface-dark-foreground/40">Next due</p>
+                      <p className="text-sm font-semibold text-surface-dark-foreground">$150 <span className="font-normal text-surface-dark-foreground/50">· Jun 30</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Summary stats */}
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <div className="rounded-2xl border border-border bg-card p-4 transition-all hover:shadow-sm">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted"><Wallet className="h-4 w-4 text-muted-foreground" /></div>
-                  <p className="mt-3 font-heading text-xl font-bold text-foreground">{summaryStats.totalDue}</p>
+                  <p className="mt-3 font-heading text-xl font-bold text-foreground">$2,880</p>
                   <p className="text-xs text-muted-foreground">Total Due</p>
                 </div>
                 <div className="rounded-2xl border border-border bg-card p-4 transition-all hover:shadow-sm">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-success/10"><CheckCircle className="h-4 w-4 text-success" /></div>
-                  <p className="mt-3 font-heading text-xl font-bold text-foreground">{summaryStats.totalPaid}</p>
+                  <p className="mt-3 font-heading text-xl font-bold text-foreground">$3,100</p>
                   <p className="text-xs text-success">Total Paid</p>
                 </div>
                 <div className="rounded-2xl border border-border bg-card p-4 transition-all hover:shadow-sm">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive/10"><AlertTriangle className="h-4 w-4 text-destructive" /></div>
-                  <p className="mt-3 font-heading text-xl font-bold text-destructive">{summaryStats.overdue}</p>
+                  <p className="mt-3 font-heading text-xl font-bold text-destructive">$25</p>
                   <p className="text-xs text-destructive">Overdue</p>
                 </div>
                 <div className="rounded-2xl border border-border bg-card p-4 transition-all hover:shadow-sm">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning/10"><Clock className="h-4 w-4 text-warning" /></div>
-                  <p className="mt-3 font-heading text-xl font-bold text-foreground">{summaryStats.pending}</p>
+                  <p className="mt-3 font-heading text-xl font-bold text-foreground">$2,855</p>
                   <p className="text-xs text-warning">Pending</p>
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-surface-dark p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-surface-dark-foreground/60">Current Account Balance</p>
-                    <p className="mt-1 font-heading text-2xl font-bold text-surface-dark-foreground">-$2,880.00</p>
-                  </div>
-                  <button className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors active:scale-[0.97]">
-                    <CreditCard className="mr-1.5 inline h-4 w-4" />Make Payment
-                  </button>
-                </div>
-                <div className="mt-4 grid grid-cols-2 gap-4 border-t border-surface-dark-foreground/10 pt-4">
-                  <div className="flex items-center gap-2">
-                    <ArrowDownLeft className="h-3.5 w-3.5 text-success" />
-                    <div>
-                      <p className="text-xs text-surface-dark-foreground/50">Last payment</p>
-                      <p className="text-sm font-medium text-surface-dark-foreground">$200 · Feb 28</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ArrowUpRight className="h-3.5 w-3.5 text-warning" />
-                    <div>
-                      <p className="text-xs text-surface-dark-foreground/50">Next due</p>
-                      <p className="text-sm font-medium text-surface-dark-foreground">$150 · Jun 30</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {obligations.some(o => o.status === 'overdue' || o.status === 'rejected') && (
+              {/* Urgent alerts */}
+              {urgentItems.length > 0 && (
                 <div className="space-y-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-destructive">Requires Immediate Attention</p>
                   {obligations.filter(o => o.status === 'overdue').map(o => (
-                    <div key={o.id} className="flex items-center gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-3 transition-all hover:border-destructive/30">
+                    <div key={o.id} className="flex items-center gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-3.5 transition-all hover:border-destructive/30">
                       <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
-                      <p className="flex-1 text-sm text-foreground"><strong>{o.concept}</strong> — {o.amount} overdue since {o.dueDate}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{o.concept}</p>
+                        <p className="text-xs text-muted-foreground">{o.amount} overdue since {o.dueDate}</p>
+                      </div>
                       <button className="shrink-0 rounded-lg bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors active:scale-95">Pay Now</button>
                     </div>
                   ))}
                   {obligations.filter(o => o.status === 'rejected').map(o => (
-                    <div key={o.id} className="flex items-center gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-3 transition-all hover:border-destructive/30">
+                    <div key={o.id} className="flex items-center gap-3 rounded-xl border border-destructive/20 bg-destructive/5 p-3.5 transition-all hover:border-destructive/30">
                       <XCircle className="h-4 w-4 text-destructive shrink-0" />
-                      <p className="flex-1 text-sm text-foreground"><strong>{o.concept}</strong> — Payment rejected. Please retry.</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{o.concept}</p>
+                        <p className="text-xs text-muted-foreground">Payment rejected — please retry</p>
+                      </div>
                       <button className="shrink-0 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors active:scale-95">Retry</button>
                     </div>
                   ))}
                 </div>
               )}
 
+              {/* Active Obligations */}
               <div>
-                <SectionHeader title="Active Obligations" subtitle={`${obligations.filter(o => !['paid', 'validated'].includes(o.status)).length} items`} action={<button onClick={() => setActiveTab('Obligations')} className="text-xs font-medium text-primary hover:underline">View All</button>} />
+                <SectionHeader title="Active Obligations" subtitle={`${activeObligations.length} items pending`} action={
+                  <button onClick={() => setActiveTab('Obligations')} className="flex items-center gap-0.5 text-xs font-medium text-primary hover:underline">
+                    View All <ChevronRight className="h-3 w-3" />
+                  </button>
+                } />
                 <div className="mt-3 space-y-2">
-                  {obligations.filter(o => !['paid', 'validated'].includes(o.status)).slice(0, 4).map((o) => (
+                  {activeObligations.slice(0, 4).map((o) => (
                     <InvoiceCard key={o.id} {...o} />
                   ))}
                 </div>
               </div>
 
+              {/* Recent Payments */}
               <div>
-                <SectionHeader title="Recent Payments" subtitle={`${payments.length} payments`} action={<button onClick={() => setActiveTab('Payments')} className="text-xs font-medium text-primary hover:underline">View All</button>} />
+                <SectionHeader title="Recent Payments" subtitle={`${payments.length} completed`} action={
+                  <button onClick={() => setActiveTab('Payments')} className="flex items-center gap-0.5 text-xs font-medium text-primary hover:underline">
+                    View All <ChevronRight className="h-3 w-3" />
+                  </button>
+                } />
                 <div className="mt-3 space-y-2">
                   {payments.slice(0, 3).map((o) => (
                     <InvoiceCard key={o.id} {...o} />
@@ -170,18 +206,29 @@ export default function FinancePage() {
                 </div>
               </div>
 
+              {/* Transaction Timeline */}
               <div className="rounded-2xl border border-border bg-card p-5">
-                <SectionHeader title="Payment Timeline" subtitle="Recent transactions" />
+                <SectionHeader title="Transaction Timeline" subtitle="Chronological history" />
                 <div className="mt-4 space-y-0">
-                  {[...payments].reverse().map((p, i) => (
-                    <div key={p.id} className="flex gap-3">
+                  {timelineEvents.map((ev, i) => (
+                    <div key={i} className="flex gap-3">
                       <div className="flex flex-col items-center">
-                        <div className="h-2.5 w-2.5 rounded-full bg-success" />
-                        {i < payments.length - 1 && <div className="w-px flex-1 bg-border" />}
+                        <div className={cn('h-2.5 w-2.5 rounded-full mt-1', timelineDotColor[ev.type])} />
+                        {i < timelineEvents.length - 1 && <div className="w-px flex-1 bg-border" />}
                       </div>
-                      <div className="pb-4">
-                        <p className="text-sm font-medium text-foreground">{p.concept} — {p.amount}</p>
-                        <p className="text-xs text-muted-foreground">{p.paidDate} · {p.id}</p>
+                      <div className="pb-4 flex-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <p className="text-sm font-medium text-foreground">{ev.label}</p>
+                            <p className="text-xs text-muted-foreground">{ev.date}</p>
+                          </div>
+                          <span className={cn(
+                            'font-heading text-sm font-bold',
+                            ev.type === 'paid' ? 'text-success' : ev.type === 'overdue' ? 'text-destructive' : 'text-foreground'
+                          )}>
+                            {ev.type === 'paid' ? '-' : ''}{ev.amount}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -228,7 +275,7 @@ export default function FinancePage() {
                     </div>
                     <span className="font-heading text-sm font-bold text-foreground">{o.amount}</span>
                     <button className="flex items-center gap-1 rounded-lg bg-muted px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors active:scale-95">
-                      <Download className="h-3 w-3" /> Receipt
+                      <Download className="h-3 w-3" /> PDF
                     </button>
                   </div>
                 ))
