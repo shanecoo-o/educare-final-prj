@@ -1,12 +1,11 @@
 export type UserRole =
-  | 'super_admin'
-  | 'school_admin'
-  | 'secretary'
-  | 'finance'
-  | 'academic_coordinator'
-  | 'teacher'
+  | 'student'
   | 'guardian'
-  | 'student';
+  | 'teacher'
+  | 'pedagogy'
+  | 'executive'
+  | 'secretary'
+  | 'finance';
 
 export interface UserProfile {
   id: string;
@@ -18,12 +17,21 @@ export interface UserProfile {
 }
 
 export const ROLE_LABELS: Record<UserRole, string> = {
-  super_admin: 'Super Admin',
-  school_admin: 'Administration',
+  student: 'Student',
+  guardian: 'Guardian',
+  teacher: 'Teacher',
+  pedagogy: 'Academic Coordination',
+  executive: 'Administration',
   secretary: 'Secretary',
   finance: 'Finance & Treasury',
-  academic_coordinator: 'Academic Coordination',
-  teacher: 'Teacher',
-  guardian: 'Guardian',
-  student: 'Student',
+};
+
+export const ROLE_HOME: Record<UserRole, string> = {
+  student: '/app/student/dashboard',
+  guardian: '/app/guardian/dashboard',
+  teacher: '/app/teacher/dashboard',
+  pedagogy: '/app/pedagogy/dashboard',
+  executive: '/app/executive/dashboard',
+  secretary: '/app/secretary/dashboard',
+  finance: '/app/finance/dashboard',
 };
