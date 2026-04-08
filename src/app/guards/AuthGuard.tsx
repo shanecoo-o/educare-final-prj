@@ -1,14 +1,9 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
-/**
- * AuthGuard – wraps authenticated route groups.
- * Currently uses a placeholder check (always authenticated).
- * Replace `isAuthenticated` with real auth state when backend is connected.
- */
 export function AuthGuard() {
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
-  // TODO: replace with real auth check (e.g. Supabase session)
-  const isAuthenticated = true;
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
