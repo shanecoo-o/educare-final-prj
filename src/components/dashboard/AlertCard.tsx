@@ -8,6 +8,7 @@ interface AlertCardProps {
   variant?: 'warning' | 'destructive' | 'info' | 'success';
   action?: string;
   onAction?: () => void;
+  className?: string;
 }
 
 const variantStyles = {
@@ -24,9 +25,9 @@ const iconStyles = {
   success: 'text-success',
 };
 
-export function AlertCard({ icon: Icon = AlertTriangle, title, description, variant = 'warning', action, onAction }: AlertCardProps) {
+export function AlertCard({ icon: Icon = AlertTriangle, title, description, variant = 'warning', action, onAction, className }: AlertCardProps) {
   return (
-    <div className={cn('flex items-start gap-3 rounded-xl border p-4', variantStyles[variant])}>
+    <div className={cn('flex items-start gap-3 rounded-xl border p-4', variantStyles[variant], className)}>
       <div className={cn('mt-0.5 shrink-0', iconStyles[variant])}>
         <Icon className="h-4 w-4" />
       </div>
