@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export { FinanceDashboard } from '@/pages/app/RoleDashboards';
+export { FinanceAdminDashboard as FinanceDashboard } from '@/pages/app/RoleDashboards';
 
 /* ─── PAYMENTS ─── */
 export function FinancePayments() {
