@@ -13,56 +13,56 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const linkedStudents = [students[0], students[3]]; // John Smith, Sarah Johnson
-const studentPayments = payments.filter(p => ['STU-001', 'STU-004'].includes(p.studentId));
+const linkedStudents = [students[0], students[3]]; // Amélia, João
+const studentPayments = payments.filter(p => ['ALU-001', 'ALU-004'].includes(p.studentId));
 
 export { GuardianDashboard } from '@/pages/app/RoleDashboards';
 
-/* ─── STUDENTS ─── */
+/* ─── EDUCANDOS ─── */
 export function GuardianStudents() {
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">My Students</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Monitor your children's academic progress.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Os Meus Educandos</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Acompanhe o progresso académico dos seus educandos.</p>
       </div>
 
       <div className="space-y-4">
         {linkedStudents.map(s => {
           const studentGrades = grades.filter(g => g.studentId === s.id);
           const recentGrades = studentGrades.slice(0, 3);
-          const sPayments = payments.filter(p => p.studentId === s.id && ['pending', 'overdue'].includes(p.status));
+          const sPayments = payments.filter(p => p.studentId === s.id && ['pendente', 'atrasado'].includes(p.status));
           const totalDue = sPayments.reduce((sum, p) => sum + (p.amount - p.paidAmount), 0);
 
           return (
             <div key={s.id} className="rounded-2xl border border-border bg-card p-5">
               <div className="flex items-center gap-4 mb-4">
-                <div className={cn('flex h-12 w-12 items-center justify-center rounded-xl font-heading text-base font-bold', s.status === 'excellent' ? 'bg-success/10 text-success' : s.status === 'at_risk' ? 'bg-warning/10 text-warning' : 'bg-primary/10 text-primary')}>
+                <div className={cn('flex h-12 w-12 items-center justify-center rounded-xl font-heading text-base font-bold', s.estado === 'excelente' ? 'bg-success/10 text-success' : s.estado === 'em_risco' ? 'bg-warning/10 text-warning' : 'bg-primary/10 text-primary')}>
                   {s.avatar}
                 </div>
                 <div className="flex-1">
                   <p className="font-heading text-base font-semibold text-foreground">{s.name}</p>
-                  <p className="text-xs text-muted-foreground">Grade {s.grade}{s.section} · {s.id}</p>
+                  <p className="text-xs text-muted-foreground">{s.classe}ª {s.turma} · {s.id}</p>
                 </div>
-                <StatusBadge label={s.status === 'excellent' ? 'Excellent' : s.status === 'at_risk' ? 'At Risk' : 'Active'} variant={s.status === 'excellent' ? 'success' : s.status === 'at_risk' ? 'warning' : 'primary'} dot />
+                <StatusBadge label={s.estado === 'excelente' ? 'Excelente' : s.estado === 'em_risco' ? 'Em Risco' : 'Activo'} variant={s.estado === 'excelente' ? 'success' : s.estado === 'em_risco' ? 'warning' : 'primary'} dot />
               </div>
 
               <div className="grid grid-cols-4 gap-3 mb-4">
                 <div className="text-center">
-                  <p className="font-heading text-lg font-bold text-foreground">{s.gpa.toFixed(1)}</p>
-                  <p className="text-[10px] text-muted-foreground">GPA</p>
+                  <p className="font-heading text-lg font-bold text-foreground">{s.media.toFixed(1)}</p>
+                  <p className="text-[10px] text-muted-foreground">Média</p>
                 </div>
                 <div className="text-center">
-                  <p className="font-heading text-lg font-bold text-foreground">{s.attendanceRate}%</p>
-                  <p className="text-[10px] text-muted-foreground">Attendance</p>
+                  <p className="font-heading text-lg font-bold text-foreground">{s.taxaAssiduidade}%</p>
+                  <p className="text-[10px] text-muted-foreground">Assiduidade</p>
                 </div>
                 <div className="text-center">
                   <p className="font-heading text-lg font-bold text-foreground">{studentGrades.length}</p>
-                  <p className="text-[10px] text-muted-foreground">Grades</p>
+                  <p className="text-[10px] text-muted-foreground">Notas</p>
                 </div>
                 <div className="text-center">
-                  <p className={cn('font-heading text-lg font-bold', totalDue > 0 ? 'text-warning' : 'text-success')}>${totalDue.toLocaleString()}</p>
-                  <p className="text-[10px] text-muted-foreground">Due</p>
+                  <p className={cn('font-heading text-lg font-bold', totalDue > 0 ? 'text-warning' : 'text-success')}>{totalDue.toLocaleString('pt-PT')} MT</p>
+                  <p className="text-[10px] text-muted-foreground">Dívida</p>
                 </div>
               </div>
 
@@ -70,8 +70,8 @@ export function GuardianStudents() {
                 <div className="space-y-1">
                   {recentGrades.map(g => (
                     <div key={g.id} className="flex items-center justify-between rounded-lg px-3 py-2 bg-muted/30">
-                      <span className="text-xs text-foreground">{g.subjectName} — {g.evaluation}</span>
-                      <span className="font-heading text-xs font-bold text-foreground">{g.score}/{g.maxScore}</span>
+                      <span className="text-xs text-foreground">{g.subjectName} — {g.avaliacao}</span>
+                      <span className="font-heading text-xs font-bold text-foreground">{g.nota}/{g.maxNota}</span>
                     </div>
                   ))}
                 </div>
@@ -84,29 +84,29 @@ export function GuardianStudents() {
   );
 }
 
-/* ─── PERFORMANCE ─── */
+/* ─── DESEMPENHO ─── */
 export function GuardianPerformance() {
   const s = linkedStudents[0];
   const subjectAverages = subjects.map(sub => ({
     name: sub.name,
     average: getSubjectAverage(s.id, sub.id),
-  })).filter(s => s.average > 0);
+  })).filter(sa => sa.average > 0);
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Performance</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{s.name}'s academic performance analysis.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Desempenho</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Análise do desempenho de {s.name}.</p>
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatsCard label="GPA" value={s.gpa.toFixed(1)} icon={TrendingUp} variant="primary" />
-        <StatsCard label="Attendance" value={`${s.attendanceRate}%`} icon={CheckCircle} />
-        <StatsCard label="Best Subject" value="Math II" icon={GraduationCap} />
-        <StatsCard label="Weakest" value="Biology" icon={Clock} trend="Needs support" />
+        <StatsCard label="Média" value={s.media.toFixed(1)} icon={TrendingUp} variant="primary" />
+        <StatsCard label="Assiduidade" value={`${s.taxaAssiduidade}%`} icon={CheckCircle} />
+        <StatsCard label="Melhor" value="Inglês" icon={GraduationCap} />
+        <StatsCard label="Mais Fraca" value="Biologia" icon={Clock} trend="Apoio necessário" />
       </div>
 
-      <SectionHeader title="Subject Averages" className="mb-3" />
+      <SectionHeader title="Médias por Disciplina" className="mb-3" />
       <div className="space-y-2">
         {subjectAverages.map((sub, i) => (
           <div key={i} className="rounded-xl border border-border bg-card px-4 py-3">
@@ -124,38 +124,39 @@ export function GuardianPerformance() {
   );
 }
 
-/* ─── ATTENDANCE ─── */
+/* ─── ASSIDUIDADE ─── */
 export function GuardianAttendance() {
   const s = linkedStudents[0];
   const records = attendanceRecords.filter(a => a.studentId === s.id);
-  const statusVariant = (st: string) => st === 'present' ? 'success' as const : st === 'absent' ? 'destructive' as const : st === 'late' ? 'warning' as const : 'info' as const;
+  const statusVariant = (st: string) => st === 'presente' ? 'success' as const : st === 'falta' ? 'destructive' as const : st === 'atraso' ? 'warning' as const : 'info' as const;
+  const statusLabel = (st: string) => st === 'presente' ? 'Presente' : st === 'falta' ? 'Falta' : st === 'atraso' ? 'Atraso' : 'Justificada';
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Attendance</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{s.name}'s attendance records.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Assiduidade</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Registos de assiduidade de {s.name}.</p>
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatsCard label="Rate" value={`${s.attendanceRate}%`} icon={CheckCircle} variant="primary" />
-        <StatsCard label="Present" value={records.filter(r => r.status === 'present').length} icon={CheckCircle} />
-        <StatsCard label="Absent" value={records.filter(r => r.status === 'absent').length} icon={Clock} />
-        <StatsCard label="Late" value={records.filter(r => r.status === 'late').length} icon={Clock} />
+        <StatsCard label="Taxa" value={`${s.taxaAssiduidade}%`} icon={CheckCircle} variant="primary" />
+        <StatsCard label="Presenças" value={records.filter(r => r.status === 'presente').length} icon={CheckCircle} />
+        <StatsCard label="Faltas" value={records.filter(r => r.status === 'falta').length} icon={Clock} />
+        <StatsCard label="Atrasos" value={records.filter(r => r.status === 'atraso').length} icon={Clock} />
       </div>
 
-      <SectionHeader title="Recent Records" className="mb-3" />
+      <SectionHeader title="Registos Recentes" className="mb-3" />
       <div className="space-y-1.5">
         {records.map(r => (
           <div key={r.id} className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3">
             <div className="w-20 shrink-0">
-              <p className="text-xs font-medium text-foreground">{new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+              <p className="text-xs font-medium text-foreground">{new Date(r.date).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })}</p>
             </div>
             <div className="flex-1">
-              <p className="text-sm text-foreground">{r.subject}</p>
-              {r.note && <p className="text-xs text-muted-foreground">{r.note}</p>}
+              <p className="text-sm text-foreground">{r.disciplina}</p>
+              {r.nota && <p className="text-xs text-muted-foreground">{r.nota}</p>}
             </div>
-            <StatusBadge label={r.status} variant={statusVariant(r.status)} dot />
+            <StatusBadge label={statusLabel(r.status)} variant={statusVariant(r.status)} dot />
           </div>
         ))}
       </div>
@@ -163,52 +164,53 @@ export function GuardianAttendance() {
   );
 }
 
-/* ─── SCHEDULE ─── */
+/* ─── HORÁRIO ─── */
 export function GuardianSchedule() {
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Schedule</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{linkedStudents[0].name}'s class schedule.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Horário</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Horário de {linkedStudents[0].name}.</p>
       </div>
       <ScheduleView schedule={weeklySchedule} showTeacher />
     </PageContainer>
   );
 }
 
-/* ─── FINANCE ─── */
+/* ─── FINANÇAS ─── */
 export function GuardianFinance() {
-  const pending = studentPayments.filter(p => ['pending', 'overdue', 'partial'].includes(p.status));
+  const pending = studentPayments.filter(p => ['pendente', 'atrasado', 'parcial'].includes(p.status));
   const totalDue = pending.reduce((s, p) => s + (p.amount - p.paidAmount), 0);
-  const statusVariant = (s: string) => s === 'overdue' ? 'destructive' as const : s === 'partial' ? 'warning' as const : 'muted' as const;
+  const statusVariant = (s: string) => s === 'atrasado' ? 'destructive' as const : s === 'parcial' ? 'warning' as const : 'muted' as const;
+  const statusLabel = (s: string) => s === 'atrasado' ? 'Atrasado' : s === 'parcial' ? 'Parcial' : 'Pendente';
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Finance</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Financial overview and pending obligations.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Finanças</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Visão financeira e obrigações pendentes.</p>
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <StatsCard label="Total Due" value={`$${totalDue.toLocaleString()}`} icon={Wallet} variant="primary" />
-        <StatsCard label="Overdue" value={`$${pending.filter(p => p.status === 'overdue').reduce((s, p) => s + p.amount, 0).toLocaleString()}`} icon={Clock} />
-        <StatsCard label="Students" value={linkedStudents.length} icon={Users} />
+        <StatsCard label="Total em Dívida" value={`${totalDue.toLocaleString('pt-PT')} MT`} icon={Wallet} variant="primary" />
+        <StatsCard label="Em Atraso" value={`${pending.filter(p => p.status === 'atrasado').reduce((s, p) => s + p.amount, 0).toLocaleString('pt-PT')} MT`} icon={Clock} />
+        <StatsCard label="Educandos" value={linkedStudents.length} icon={Users} />
       </div>
 
-      {pending.some(p => p.status === 'overdue') && (
-        <AlertCard title="Overdue payments require attention" description="Some fees are past due. Please review and settle them." variant="destructive" className="mb-4" />
+      {pending.some(p => p.status === 'atrasado') && (
+        <AlertCard title="Pagamentos em atraso" description="Algumas propinas estão vencidas. Regularize a situação." variant="destructive" className="mb-4" />
       )}
 
-      <SectionHeader title="Pending Obligations" className="mb-3" />
+      <SectionHeader title="Obrigações Pendentes" className="mb-3" />
       <div className="space-y-1.5">
         {pending.map(p => (
-          <div key={p.id} className={cn('flex items-center gap-3 rounded-xl border bg-card px-4 py-3', p.status === 'overdue' ? 'border-destructive/20' : 'border-border')}>
+          <div key={p.id} className={cn('flex items-center gap-3 rounded-xl border bg-card px-4 py-3', p.status === 'atrasado' ? 'border-destructive/20' : 'border-border')}>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">{p.concept}</p>
-              <p className="text-xs text-muted-foreground">{p.studentName} · Due {new Date(p.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+              <p className="text-sm font-medium text-foreground">{p.conceito}</p>
+              <p className="text-xs text-muted-foreground">{p.studentName} · Venc. {new Date(p.dueDate).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })}</p>
             </div>
-            <span className={cn('font-heading text-sm font-bold', p.status === 'overdue' ? 'text-destructive' : 'text-foreground')}>${p.amount.toLocaleString()}</span>
-            <StatusBadge label={p.status} variant={statusVariant(p.status)} />
+            <span className={cn('font-heading text-sm font-bold', p.status === 'atrasado' ? 'text-destructive' : 'text-foreground')}>{p.amount.toLocaleString('pt-PT')} MT</span>
+            <StatusBadge label={statusLabel(p.status)} variant={statusVariant(p.status)} />
           </div>
         ))}
       </div>
@@ -216,30 +218,31 @@ export function GuardianFinance() {
   );
 }
 
-/* ─── PAYMENTS ─── */
+/* ─── PAGAMENTOS ─── */
 export function GuardianPayments() {
-  const allPayments = studentPayments.sort((a, b) => (b.paidDate || b.dueDate).localeCompare(a.paidDate || a.dueDate));
-  const statusVariant = (s: string) => s === 'paid' || s === 'validated' ? 'success' as const : s === 'overdue' ? 'destructive' as const : s === 'under_review' ? 'info' as const : s === 'rejected' ? 'destructive' as const : 'muted' as const;
+  const allPayments = [...studentPayments].sort((a, b) => (b.paidDate || b.dueDate).localeCompare(a.paidDate || a.dueDate));
+  const statusVariant = (s: string) => s === 'pago' || s === 'validado' ? 'success' as const : s === 'atrasado' ? 'destructive' as const : s === 'em_revisao' ? 'info' as const : s === 'rejeitado' ? 'destructive' as const : 'muted' as const;
+  const statusLabel = (s: string) => s === 'pago' ? 'Pago' : s === 'validado' ? 'Validado' : s === 'atrasado' ? 'Atrasado' : s === 'em_revisao' ? 'Em Revisão' : s === 'rejeitado' ? 'Rejeitado' : s === 'parcial' ? 'Parcial' : 'Pendente';
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Payments</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Make and track payments.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Pagamentos</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Efectuar e acompanhar pagamentos.</p>
       </div>
 
       <div className="space-y-1.5">
         {allPayments.map(p => (
           <div key={p.id} className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3">
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">{p.concept}</p>
+              <p className="text-sm font-medium text-foreground">{p.conceito}</p>
               <p className="text-xs text-muted-foreground">
-                {p.studentName} · {p.paidDate ? `Paid ${new Date(p.paidDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : `Due ${new Date(p.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-                {p.reference && ` · ${p.reference}`}
+                {p.studentName} · {p.paidDate ? `Pago ${new Date(p.paidDate).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })}` : `Venc. ${new Date(p.dueDate).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })}`}
+                {p.referencia && ` · ${p.referencia}`}
               </p>
             </div>
-            <span className="font-heading text-sm font-bold text-foreground">${p.amount.toLocaleString()}</span>
-            <StatusBadge label={p.status} variant={statusVariant(p.status)} />
+            <span className="font-heading text-sm font-bold text-foreground">{p.amount.toLocaleString('pt-PT')} MT</span>
+            <StatusBadge label={statusLabel(p.status)} variant={statusVariant(p.status)} />
           </div>
         ))}
       </div>
@@ -247,21 +250,21 @@ export function GuardianPayments() {
   );
 }
 
-/* ─── DOCUMENTS ─── */
+/* ─── DOCUMENTOS ─── */
 export function GuardianDocuments() {
   const docs = [
-    { name: 'Report Card — Term 1', student: 'John Smith', date: 'Jan 2026', type: 'report' },
-    { name: 'Enrollment Certificate', student: 'John Smith', date: 'Sep 2025', type: 'certificate' },
-    { name: 'Report Card — Term 1', student: 'Sarah Johnson', date: 'Jan 2026', type: 'report' },
-    { name: 'Medical Form', student: 'John Smith', date: 'Aug 2025', type: 'form' },
-    { name: 'Enrollment Certificate', student: 'Sarah Johnson', date: 'Sep 2025', type: 'certificate' },
+    { name: 'Pauta — 1º Trimestre', student: 'Amélia Mondlane', date: 'Jan 2026', type: 'pauta' },
+    { name: 'Certificado de Matrícula', student: 'Amélia Mondlane', date: 'Set 2025', type: 'certificado' },
+    { name: 'Pauta — 1º Trimestre', student: 'João Sitoe', date: 'Jan 2026', type: 'pauta' },
+    { name: 'Ficha Médica', student: 'Amélia Mondlane', date: 'Ago 2025', type: 'ficha' },
+    { name: 'Certificado de Matrícula', student: 'João Sitoe', date: 'Set 2025', type: 'certificado' },
   ];
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Documents</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Academic documents and certificates.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Documentos</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Documentos académicos e certificados.</p>
       </div>
       <div className="space-y-1.5">
         {docs.map((d, i) => (
@@ -282,16 +285,16 @@ export function GuardianDocuments() {
 /* ─── CHAT ─── */
 export function GuardianChat() {
   const conversations = [
-    { name: 'Dr. Alan Smith', lastMessage: 'John is doing well in Math', time: '2h ago', unread: 1 },
-    { name: 'Dr. David Park', lastMessage: 'Biology requires more attention', time: '1d ago', unread: 0 },
-    { name: 'Secretary Office', lastMessage: 'Document request processed', time: '3d ago', unread: 0 },
+    { name: 'Prof. António Magaia', lastMessage: 'Amélia está a ir bem em Matemática', time: '2h atrás', unread: 1 },
+    { name: 'Prof. Ernesto Vilankulo', lastMessage: 'Biologia requer mais atenção', time: '1d atrás', unread: 0 },
+    { name: 'Secretaria', lastMessage: 'Pedido de documento processado', time: '3d atrás', unread: 0 },
   ];
 
   return (
     <PageContainer>
       <div className="mb-6">
         <h1 className="font-heading text-2xl font-bold text-foreground">Chat</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Communicate with teachers and staff.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Comunicar com professores e funcionários.</p>
       </div>
       <div className="space-y-1.5">
         {conversations.map((c, i) => (
@@ -312,20 +315,20 @@ export function GuardianChat() {
   );
 }
 
-/* ─── NOTIFICATIONS ─── */
+/* ─── NOTIFICAÇÕES ─── */
 export function GuardianNotifications() {
   const items = [
-    { title: 'New Grade: Mathematics II', message: 'John Smith received 18/20 on the Midterm Exam.', type: 'grade', time: '2h ago', read: false },
-    { title: 'Absence Recorded', message: 'John was absent in Biology on Apr 4.', type: 'attendance', time: '5d ago', read: false },
-    { title: 'Payment Overdue', message: 'Library Fine of $25 for John Smith is past due.', type: 'payment', time: '1w ago', read: true },
-    { title: 'Field Trip Permission', message: 'Biology field trip on Apr 18 requires your approval.', type: 'alert', time: '3d ago', read: true },
+    { title: 'Nova Nota: Matemática', message: 'Amélia Mondlane obteve 16/20 na ACS1.', type: 'nota', time: '2h atrás', read: false },
+    { title: 'Falta Registada', message: 'Amélia faltou a Biologia no dia 9 de Abril.', type: 'assiduidade', time: '5d atrás', read: false },
+    { title: 'Pagamento em Atraso', message: 'Multa de 500 MT está vencida.', type: 'pagamento', time: '1 sem. atrás', read: true },
+    { title: 'Autorização para Visita', message: 'Visita de Biologia no dia 18 de Abril requer autorização.', type: 'alerta', time: '3d atrás', read: true },
   ];
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Notifications</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Alerts and important updates.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Notificações</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Alertas e actualizações importantes.</p>
       </div>
       <div className="space-y-1.5">
         {items.map((n, i) => (
