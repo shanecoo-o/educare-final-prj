@@ -3,78 +3,80 @@ import { SectionHeader } from '@/components/ui/section-header';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { AlertCard } from '@/components/dashboard/AlertCard';
-import { QuickActionCard } from '@/components/dashboard/QuickActionCard';
 import { InvoiceCard } from '@/components/finance/InvoiceCard';
 import {
-  payments, obligations, financeAccounts, financeStats, students
+  payments, obligations, financeAccounts, financeStats
 } from '@/data/mockData';
 import {
   Wallet, CheckCircle, AlertTriangle, Clock, FileText, BarChart3,
-  Users, Receipt, Banknote, TrendingUp, ArrowDownRight, ArrowUpRight,
-  Filter, Download, Search
+  Receipt, TrendingUp, ArrowDownRight, ArrowUpRight,
+  Filter, Download
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export { FinanceAdminDashboard as FinanceDashboard } from '@/pages/app/RoleDashboards';
 
-/* ─── PAYMENTS ─── */
+/* ─── PAGAMENTOS ─── */
 export function FinancePayments() {
   const sorted = [...payments].sort((a, b) => {
-    const order = { overdue: 0, under_review: 1, partial: 2, pending: 3, rejected: 4, paid: 5, validated: 6 };
+    const order: Record<string, number> = { atrasado: 0, em_revisao: 1, parcial: 2, pendente: 3, rejeitado: 4, pago: 5, validado: 6 };
     return (order[a.status] ?? 9) - (order[b.status] ?? 9);
   });
+
+  const statusLabel = (s: string) => s === 'pago' ? 'Pago' : s === 'validado' ? 'Validado' : s === 'atrasado' ? 'Atrasado' : s === 'em_revisao' ? 'Em Revisão' : s === 'parcial' ? 'Parcial' : s === 'rejeitado' ? 'Rejeitado' : 'Pendente';
 
   return (
     <PageContainer>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="font-heading text-2xl font-bold text-foreground">Payments</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Track and manage all payment transactions.</p>
+          <h1 className="font-heading text-2xl font-bold text-foreground">Pagamentos</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Acompanhar e gerir todas as transacções.</p>
         </div>
         <button className="flex items-center gap-2 rounded-xl bg-muted px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors">
           <Filter className="h-3.5 w-3.5" />
-          Filter
+          Filtrar
         </button>
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatsCard label="Total" value={payments.length} icon={FileText} variant="primary" />
-        <StatsCard label="Pending Review" value={financeStats.pendingValidation} icon={Clock} />
-        <StatsCard label="Overdue" value={payments.filter(p => p.status === 'overdue').length} icon={AlertTriangle} />
-        <StatsCard label="Validated" value={payments.filter(p => p.status === 'validated').length} icon={CheckCircle} />
+        <StatsCard label="A Validar" value={financeStats.pendentesValidacao} icon={Clock} />
+        <StatsCard label="Atrasados" value={payments.filter(p => p.status === 'atrasado').length} icon={AlertTriangle} />
+        <StatsCard label="Validados" value={payments.filter(p => p.status === 'validado').length} icon={CheckCircle} />
       </div>
 
       <div className="space-y-1.5">
         {sorted.map(p => (
-          <InvoiceCard
-            key={p.id}
-            id={p.id}
-            concept={`${p.studentName} — ${p.concept}`}
-            amount={`$${p.amount.toLocaleString()}`}
-            dueDate={new Date(p.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            status={p.status as any}
-            paidAmount={p.paidAmount > 0 ? `$${p.paidAmount.toLocaleString()}` : undefined}
-            paidDate={p.paidDate ? new Date(p.paidDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : undefined}
-          />
+          <div key={p.id} className={cn('flex items-center gap-3 rounded-xl border bg-card px-4 py-3', p.status === 'atrasado' ? 'border-destructive/20' : 'border-border')}>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground">{p.studentName} — {p.conceito}</p>
+              <p className="text-xs text-muted-foreground">
+                Venc. {new Date(p.dueDate).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })}
+                {p.paidAmount > 0 && ` · Pago: ${p.paidAmount.toLocaleString('pt-PT')} MT`}
+              </p>
+            </div>
+            <span className="font-heading text-sm font-bold text-foreground">{p.amount.toLocaleString('pt-PT')} MT</span>
+            <StatusBadge label={statusLabel(p.status)} variant={p.status === 'pago' || p.status === 'validado' ? 'success' : p.status === 'atrasado' || p.status === 'rejeitado' ? 'destructive' : p.status === 'em_revisao' ? 'info' : p.status === 'parcial' ? 'warning' : 'muted'} />
+          </div>
         ))}
       </div>
     </PageContainer>
   );
 }
 
-/* ─── VALIDATION ─── */
+/* ─── VALIDAÇÃO ─── */
 export function FinanceValidation() {
-  const pendingValidation = payments.filter(p => p.status === 'under_review');
+  const pendingValidation = payments.filter(p => p.status === 'em_revisao');
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Payment Validation</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Validate pending payment submissions.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Validação de Pagamentos</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Validar submissões de pagamento pendentes.</p>
       </div>
 
       {pendingValidation.length > 0 && (
-        <AlertCard title={`${pendingValidation.length} payment(s) awaiting validation`} description="Review and confirm or reject submitted payments." variant="info" action="Batch Validate" className="mb-6" />
+        <AlertCard title={`${pendingValidation.length} pagamento(s) a aguardar validação`} description="Reveja e confirme ou rejeite os pagamentos submetidos." variant="info" action="Validar em Lote" className="mb-6" />
       )}
 
       <div className="space-y-2">
@@ -82,17 +84,17 @@ export function FinanceValidation() {
           <div key={p.id} className="rounded-xl border border-info/20 bg-info/[0.02] p-4">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <p className="text-sm font-medium text-foreground">{p.studentName} — {p.concept}</p>
-                <p className="text-xs text-muted-foreground">{p.reference} · {p.method} · Submitted {p.paidDate && new Date(p.paidDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                <p className="text-sm font-medium text-foreground">{p.studentName} — {p.conceito}</p>
+                <p className="text-xs text-muted-foreground">{p.referencia} · {p.metodo} · Submetido {p.paidDate && new Date(p.paidDate).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })}</p>
               </div>
-              <span className="font-heading text-base font-bold text-foreground">${p.paidAmount.toLocaleString()}</span>
+              <span className="font-heading text-base font-bold text-foreground">{p.paidAmount.toLocaleString('pt-PT')} MT</span>
             </div>
             <div className="flex gap-2">
               <button className="rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-success-foreground hover:bg-success/90 transition-colors active:scale-95">
-                <CheckCircle className="h-3 w-3 inline mr-1" />Validate
+                <CheckCircle className="h-3 w-3 inline mr-1" />Validar
               </button>
               <button className="rounded-lg bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors active:scale-95">
-                Reject
+                Rejeitar
               </button>
             </div>
           </div>
@@ -102,33 +104,35 @@ export function FinanceValidation() {
   );
 }
 
-/* ─── OBLIGATIONS ─── */
+/* ─── OBRIGAÇÕES ─── */
 export function FinanceObligations() {
-  const statusVariant = (s: string) => s === 'paid' ? 'success' as const : s === 'overdue' ? 'destructive' as const : 'muted' as const;
+  const statusVariant = (s: string) => s === 'pago' ? 'success' as const : s === 'atrasado' ? 'destructive' as const : 'muted' as const;
+  const statusLabel = (s: string) => s === 'pago' ? 'Pago' : s === 'atrasado' ? 'Atrasado' : 'Activo';
+  const catLabel = (c: string) => c === 'propina' ? 'Propina' : c === 'multa' ? 'Multa' : c === 'matricula' ? 'Matrícula' : c === 'material' ? 'Material' : 'Actividade';
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Obligations</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Manage student financial obligations.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Obrigações</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Gerir obrigações financeiras dos alunos.</p>
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatsCard label="Active" value={obligations.filter(o => o.status === 'active').length} icon={FileText} variant="primary" />
-        <StatsCard label="Overdue" value={obligations.filter(o => o.status === 'overdue').length} icon={AlertTriangle} />
-        <StatsCard label="Paid" value={obligations.filter(o => o.status === 'paid').length} icon={CheckCircle} />
-        <StatsCard label="Total Value" value={`$${obligations.reduce((s, o) => s + o.amount, 0).toLocaleString()}`} icon={Wallet} />
+        <StatsCard label="Activas" value={obligations.filter(o => o.status === 'activo').length} icon={FileText} variant="primary" />
+        <StatsCard label="Atrasadas" value={obligations.filter(o => o.status === 'atrasado').length} icon={AlertTriangle} />
+        <StatsCard label="Pagas" value={obligations.filter(o => o.status === 'pago').length} icon={CheckCircle} />
+        <StatsCard label="Valor Total" value={`${obligations.reduce((s, o) => s + o.amount, 0).toLocaleString('pt-PT')} MT`} icon={Wallet} />
       </div>
 
       <div className="space-y-1.5">
         {obligations.map(o => (
-          <div key={o.id} className={cn('flex items-center gap-3 rounded-xl border bg-card px-4 py-3', o.status === 'overdue' ? 'border-destructive/20' : 'border-border')}>
+          <div key={o.id} className={cn('flex items-center gap-3 rounded-xl border bg-card px-4 py-3', o.status === 'atrasado' ? 'border-destructive/20' : 'border-border')}>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">{o.concept}</p>
-              <p className="text-xs text-muted-foreground">{o.studentName} · {o.category} · Due {new Date(o.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+              <p className="text-sm font-medium text-foreground">{o.conceito}</p>
+              <p className="text-xs text-muted-foreground">{o.studentName} · {catLabel(o.categoria)} · Venc. {new Date(o.dueDate).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })}</p>
             </div>
-            <span className="font-heading text-sm font-bold text-foreground">${o.amount.toLocaleString()}</span>
-            <StatusBadge label={o.status} variant={statusVariant(o.status)} dot />
+            <span className="font-heading text-sm font-bold text-foreground">{o.amount.toLocaleString('pt-PT')} MT</span>
+            <StatusBadge label={statusLabel(o.status)} variant={statusVariant(o.status)} dot />
           </div>
         ))}
       </div>
@@ -136,15 +140,16 @@ export function FinanceObligations() {
   );
 }
 
-/* ─── ACCOUNTS ─── */
+/* ─── CONTAS ─── */
 export function FinanceAccounts() {
-  const statusVariant = (s: string) => s === 'paid_up' ? 'success' as const : s === 'delinquent' ? 'destructive' as const : 'muted' as const;
+  const statusVariant = (s: string) => s === 'quite' ? 'success' as const : s === 'inadimplente' ? 'destructive' as const : 'muted' as const;
+  const statusLabel = (s: string) => s === 'quite' ? 'Quite' : s === 'inadimplente' ? 'Inadimplente' : 'Regular';
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Student Accounts</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Individual student financial accounts.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Contas de Alunos</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Contas individuais dos alunos.</p>
       </div>
 
       <div className="space-y-2">
@@ -155,23 +160,23 @@ export function FinanceAccounts() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted font-heading text-xs font-bold">{a.studentName.split(' ').map(n => n[0]).join('')}</div>
                 <div>
                   <p className="text-sm font-medium text-foreground">{a.studentName}</p>
-                  <p className="text-xs text-muted-foreground">{a.studentId}{a.lastPayment && ` · Last payment: ${new Date(a.lastPayment).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}</p>
+                  <p className="text-xs text-muted-foreground">{a.studentId}{a.ultimoPagamento && ` · Últ. pag.: ${new Date(a.ultimoPagamento).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })}`}</p>
                 </div>
               </div>
-              <StatusBadge label={a.status.replace('_', ' ')} variant={statusVariant(a.status)} dot />
+              <StatusBadge label={statusLabel(a.status)} variant={statusVariant(a.status)} dot />
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3">
               <div className="rounded-lg bg-muted/50 p-2 text-center">
-                <p className="text-[10px] text-muted-foreground">Due</p>
-                <p className="font-heading text-sm font-bold text-foreground">${a.totalDue.toLocaleString()}</p>
+                <p className="text-[10px] text-muted-foreground">Devido</p>
+                <p className="font-heading text-sm font-bold text-foreground">{a.totalDevido.toLocaleString('pt-PT')} MT</p>
               </div>
               <div className="rounded-lg bg-muted/50 p-2 text-center">
-                <p className="text-[10px] text-muted-foreground">Paid</p>
-                <p className="font-heading text-sm font-bold text-success">${a.totalPaid.toLocaleString()}</p>
+                <p className="text-[10px] text-muted-foreground">Pago</p>
+                <p className="font-heading text-sm font-bold text-success">{a.totalPago.toLocaleString('pt-PT')} MT</p>
               </div>
               <div className="rounded-lg bg-muted/50 p-2 text-center">
-                <p className="text-[10px] text-muted-foreground">Balance</p>
-                <p className={cn('font-heading text-sm font-bold', a.balance > 0 ? 'text-warning' : 'text-success')}>${a.balance.toLocaleString()}</p>
+                <p className="text-[10px] text-muted-foreground">Saldo</p>
+                <p className={cn('font-heading text-sm font-bold', a.saldo > 0 ? 'text-warning' : 'text-success')}>{a.saldo.toLocaleString('pt-PT')} MT</p>
               </div>
             </div>
           </div>
@@ -181,15 +186,15 @@ export function FinanceAccounts() {
   );
 }
 
-/* ─── RECEIPTS ─── */
+/* ─── RECIBOS ─── */
 export function FinanceReceipts() {
-  const paidPayments = payments.filter(p => ['paid', 'validated'].includes(p.status));
+  const paidPayments = payments.filter(p => ['pago', 'validado'].includes(p.status));
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Receipts</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Generate and manage payment receipts.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Recibos</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Gerar e gerir recibos de pagamento.</p>
       </div>
 
       <div className="space-y-1.5">
@@ -197,10 +202,10 @@ export function FinanceReceipts() {
           <div key={p.id} className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3">
             <Receipt className="h-4 w-4 text-muted-foreground shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">{p.studentName} — {p.concept}</p>
-              <p className="text-xs text-muted-foreground">{p.reference} · {p.method} · {p.paidDate && new Date(p.paidDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+              <p className="text-sm font-medium text-foreground">{p.studentName} — {p.conceito}</p>
+              <p className="text-xs text-muted-foreground">{p.referencia} · {p.metodo} · {p.paidDate && new Date(p.paidDate).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
             </div>
-            <span className="font-heading text-sm font-bold text-foreground">${p.paidAmount.toLocaleString()}</span>
+            <span className="font-heading text-sm font-bold text-foreground">{p.paidAmount.toLocaleString('pt-PT')} MT</span>
             <button className="rounded-lg bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors active:scale-95">
               <Download className="h-3 w-3 inline mr-1" />PDF
             </button>
@@ -211,20 +216,20 @@ export function FinanceReceipts() {
   );
 }
 
-/* ─── PENALTIES ─── */
+/* ─── MULTAS ─── */
 export function FinancePenalties() {
-  const overduePayments = payments.filter(p => p.status === 'overdue');
+  const overduePayments = payments.filter(p => p.status === 'atrasado');
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Penalties</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Late fees and penalty management.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Multas</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Gestão de multas e penalizações.</p>
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-3">
-        <StatsCard label="Overdue Items" value={overduePayments.length} icon={AlertTriangle} variant="primary" />
-        <StatsCard label="Total Overdue" value={`$${financeStats.totalOverdue.toLocaleString()}`} icon={Wallet} />
+        <StatsCard label="Itens em Atraso" value={overduePayments.length} icon={AlertTriangle} variant="primary" />
+        <StatsCard label="Total em Atraso" value={`${financeStats.totalAtrasado.toLocaleString('pt-PT')} MT`} icon={Wallet} />
       </div>
 
       <div className="space-y-1.5">
@@ -232,10 +237,10 @@ export function FinancePenalties() {
           <div key={p.id} className="flex items-center gap-3 rounded-xl border border-destructive/20 bg-destructive/[0.02] px-4 py-3">
             <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">{p.studentName} — {p.concept}</p>
-              <p className="text-xs text-destructive">Due {new Date(p.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · {Math.floor((Date.now() - new Date(p.dueDate).getTime()) / 86400000)} days overdue</p>
+              <p className="text-sm font-medium text-foreground">{p.studentName} — {p.conceito}</p>
+              <p className="text-xs text-destructive">Venc. {new Date(p.dueDate).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })} · {Math.max(0, Math.floor((Date.now() - new Date(p.dueDate).getTime()) / 86400000))} dias em atraso</p>
             </div>
-            <span className="font-heading text-sm font-bold text-destructive">${p.amount.toLocaleString()}</span>
+            <span className="font-heading text-sm font-bold text-destructive">{p.amount.toLocaleString('pt-PT')} MT</span>
           </div>
         ))}
       </div>
@@ -243,40 +248,40 @@ export function FinancePenalties() {
   );
 }
 
-/* ─── TREASURY ─── */
+/* ─── TESOURARIA ─── */
 export function FinanceTreasury() {
-  const totalInflow = payments.filter(p => ['paid', 'validated'].includes(p.status)).reduce((s, p) => s + p.paidAmount, 0);
-  const totalOutstanding = payments.filter(p => ['pending', 'overdue', 'partial'].includes(p.status)).reduce((s, p) => s + (p.amount - p.paidAmount), 0);
+  const totalInflow = payments.filter(p => ['pago', 'validado'].includes(p.status)).reduce((s, p) => s + p.paidAmount, 0);
+  const totalOutstanding = payments.filter(p => ['pendente', 'atrasado', 'parcial'].includes(p.status)).reduce((s, p) => s + (p.amount - p.paidAmount), 0);
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Treasury</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Cash flow and treasury operations.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Tesouraria</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Fluxo de caixa e operações de tesouraria.</p>
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatsCard label="Total Inflow" value={`$${totalInflow.toLocaleString()}`} icon={ArrowDownRight} variant="primary" trend="+12% vs last month" trendUp />
-        <StatsCard label="Outstanding" value={`$${totalOutstanding.toLocaleString()}`} icon={Clock} />
-        <StatsCard label="Overdue" value={`$${financeStats.totalOverdue.toLocaleString()}`} icon={AlertTriangle} />
-        <StatsCard label="Collection Rate" value="68%" icon={TrendingUp} />
+        <StatsCard label="Total Entrada" value={`${totalInflow.toLocaleString('pt-PT')} MT`} icon={ArrowDownRight} variant="primary" trend="+12% vs mês anterior" trendUp />
+        <StatsCard label="Pendente" value={`${totalOutstanding.toLocaleString('pt-PT')} MT`} icon={Clock} />
+        <StatsCard label="Em Atraso" value={`${financeStats.totalAtrasado.toLocaleString('pt-PT')} MT`} icon={AlertTriangle} />
+        <StatsCard label="Taxa de Cobrança" value="68%" icon={TrendingUp} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-2xl border border-border bg-card p-5">
-          <SectionHeader title="Monthly Summary" />
+          <SectionHeader title="Resumo Mensal" />
           <div className="mt-4 space-y-3">
             {[
-              { month: 'April 2026', inflow: 5200, outflow: 0 },
-              { month: 'March 2026', inflow: 8400, outflow: 1200 },
-              { month: 'February 2026', inflow: 3750, outflow: 800 },
-              { month: 'January 2026', inflow: 12800, outflow: 500 },
+              { month: 'Abril 2026', inflow: 20000, outflow: 0 },
+              { month: 'Março 2026', inflow: 37500, outflow: 1200 },
+              { month: 'Fevereiro 2026', inflow: 5000, outflow: 800 },
+              { month: 'Janeiro 2026', inflow: 15000, outflow: 500 },
             ].map((m, i) => (
               <div key={i} className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted/30 transition-colors">
                 <span className="text-sm font-medium text-foreground">{m.month}</span>
                 <div className="flex items-center gap-4">
-                  <span className="flex items-center gap-1 text-xs font-medium text-success"><ArrowDownRight className="h-3 w-3" />${m.inflow.toLocaleString()}</span>
-                  {m.outflow > 0 && <span className="flex items-center gap-1 text-xs font-medium text-destructive"><ArrowUpRight className="h-3 w-3" />${m.outflow.toLocaleString()}</span>}
+                  <span className="flex items-center gap-1 text-xs font-medium text-success"><ArrowDownRight className="h-3 w-3" />{m.inflow.toLocaleString('pt-PT')} MT</span>
+                  {m.outflow > 0 && <span className="flex items-center gap-1 text-xs font-medium text-destructive"><ArrowUpRight className="h-3 w-3" />{m.outflow.toLocaleString('pt-PT')} MT</span>}
                 </div>
               </div>
             ))}
@@ -284,25 +289,25 @@ export function FinanceTreasury() {
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-5">
-          <SectionHeader title="Key Metrics" />
+          <SectionHeader title="Indicadores" />
           <div className="mt-4 space-y-4">
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-xs text-muted-foreground">Collection Rate</span>
+                <span className="text-xs text-muted-foreground">Taxa de Cobrança</span>
                 <span className="text-xs font-medium text-foreground">68%</span>
               </div>
               <div className="h-2 w-full rounded-full bg-muted"><div className="h-2 rounded-full bg-primary" style={{ width: '68%' }} /></div>
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-xs text-muted-foreground">On-Time Payment Rate</span>
+                <span className="text-xs text-muted-foreground">Pagamento Pontual</span>
                 <span className="text-xs font-medium text-foreground">82%</span>
               </div>
               <div className="h-2 w-full rounded-full bg-muted"><div className="h-2 rounded-full bg-success" style={{ width: '82%' }} /></div>
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-xs text-muted-foreground">Delinquency Rate</span>
+                <span className="text-xs text-muted-foreground">Taxa de Inadimplência</span>
                 <span className="text-xs font-medium text-foreground">8%</span>
               </div>
               <div className="h-2 w-full rounded-full bg-muted"><div className="h-2 rounded-full bg-destructive" style={{ width: '8%' }} /></div>
@@ -314,21 +319,21 @@ export function FinanceTreasury() {
   );
 }
 
-/* ─── REPORTS ─── */
+/* ─── RELATÓRIOS ─── */
 export function FinanceReports() {
   const reports = [
-    { name: 'Monthly Revenue Report', period: 'April 2026', generated: 'Auto', status: 'ready' },
-    { name: 'Overdue Accounts Report', period: 'Q1 2026', generated: 'Manual', status: 'ready' },
-    { name: 'Collection Summary', period: 'March 2026', generated: 'Auto', status: 'ready' },
-    { name: 'Student Account Statements', period: 'Term 2', generated: 'On-demand', status: 'pending' },
-    { name: 'Annual Financial Summary', period: '2025-2026', generated: 'Scheduled', status: 'pending' },
+    { name: 'Relatório Mensal de Receitas', period: 'Abril 2026', generated: 'Automático', status: 'pronto' },
+    { name: 'Relatório de Contas em Atraso', period: '1º Trimestre 2026', generated: 'Manual', status: 'pronto' },
+    { name: 'Resumo de Cobranças', period: 'Março 2026', generated: 'Automático', status: 'pronto' },
+    { name: 'Extractos de Conta', period: '2º Trimestre', generated: 'A pedido', status: 'pendente' },
+    { name: 'Resumo Financeiro Anual', period: '2025-2026', generated: 'Agendado', status: 'pendente' },
   ];
 
   return (
     <PageContainer>
       <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Reports</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Financial reports and analytics.</p>
+        <h1 className="font-heading text-2xl font-bold text-foreground">Relatórios</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Relatórios e analítica financeira.</p>
       </div>
 
       <div className="space-y-1.5">
@@ -339,10 +344,10 @@ export function FinanceReports() {
               <p className="text-sm font-medium text-foreground">{r.name}</p>
               <p className="text-xs text-muted-foreground">{r.period} · {r.generated}</p>
             </div>
-            <StatusBadge label={r.status} variant={r.status === 'ready' ? 'success' : 'muted'} />
-            {r.status === 'ready' && (
+            <StatusBadge label={r.status === 'pronto' ? 'Pronto' : 'Pendente'} variant={r.status === 'pronto' ? 'success' : 'muted'} />
+            {r.status === 'pronto' && (
               <button className="rounded-lg bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors active:scale-95">
-                <Download className="h-3 w-3 inline mr-1" />Export
+                <Download className="h-3 w-3 inline mr-1" />Exportar
               </button>
             )}
           </div>

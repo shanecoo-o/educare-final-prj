@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Clock, MapPin, User, ChevronRight } from 'lucide-react';
+import { Clock, MapPin, User, ChevronRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ScheduleSlot } from '@/data/mockData';
 
@@ -9,12 +9,12 @@ interface ScheduleViewProps {
   showClassGroup?: boolean;
 }
 
-const DAYS: ScheduleSlot['day'][] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-const DAY_SHORT: Record<string, string> = { Monday: 'Mon', Tuesday: 'Tue', Wednesday: 'Wed', Thursday: 'Thu', Friday: 'Fri' };
+const DAYS: ScheduleSlot['day'][] = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+const DAY_SHORT: Record<string, string> = { Segunda: 'Seg', Terça: 'Ter', Quarta: 'Qua', Quinta: 'Qui', Sexta: 'Sex' };
 
 export function ScheduleView({ schedule, showTeacher = true, showClassGroup = false }: ScheduleViewProps) {
   const todayIdx = Math.max(0, Math.min(4, new Date().getDay() - 1));
-  const [selectedDay, setSelectedDay] = useState<ScheduleSlot['day']>(DAYS[todayIdx] || 'Monday');
+  const [selectedDay, setSelectedDay] = useState<ScheduleSlot['day']>(DAYS[todayIdx] || 'Segunda');
 
   const daySlots = schedule
     .filter(s => s.day === selectedDay)
@@ -25,7 +25,7 @@ export function ScheduleView({ schedule, showTeacher = true, showClassGroup = fa
 
   return (
     <div className="space-y-4">
-      {/* Day selector */}
+      {/* Selector de dia */}
       <div className="flex gap-1.5 overflow-x-auto pb-1">
         {DAYS.map((day, i) => {
           const isToday = i === todayIdx;
@@ -51,20 +51,20 @@ export function ScheduleView({ schedule, showTeacher = true, showClassGroup = fa
         })}
       </div>
 
-      {/* Current / Next class banner */}
+      {/* Aula actual / próxima */}
       {ongoingSlot && (
         <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
             <Clock className="h-4 w-4 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-primary">Now</p>
+            <p className="text-xs font-medium text-primary">Agora</p>
             <p className="text-sm font-semibold text-foreground truncate">{ongoingSlot.subject}</p>
             <p className="text-xs text-muted-foreground">{ongoingSlot.room} · {ongoingSlot.time}–{ongoingSlot.endTime}</p>
           </div>
           {nextSlot && (
             <div className="text-right hidden sm:block">
-              <p className="text-[10px] text-muted-foreground">Next</p>
+              <p className="text-[10px] text-muted-foreground">Próxima</p>
               <p className="text-xs font-medium text-foreground">{nextSlot.subject}</p>
               <p className="text-[10px] text-muted-foreground">{nextSlot.time}</p>
             </div>
@@ -72,10 +72,10 @@ export function ScheduleView({ schedule, showTeacher = true, showClassGroup = fa
         </div>
       )}
 
-      {/* Schedule list */}
+      {/* Lista de aulas */}
       {daySlots.length === 0 ? (
         <div className="rounded-xl border border-border bg-card p-8 text-center">
-          <p className="text-sm text-muted-foreground">No classes scheduled for {selectedDay}.</p>
+          <p className="text-sm text-muted-foreground">Sem aulas agendadas para {selectedDay}.</p>
         </div>
       ) : (
         <div className="space-y-1.5">
@@ -91,7 +91,7 @@ export function ScheduleView({ schedule, showTeacher = true, showClassGroup = fa
                   : 'border-border bg-card hover:border-primary/10 hover:shadow-sm'
               )}
             >
-              {/* Time */}
+              {/* Hora */}
               <div className="w-14 shrink-0 text-center">
                 <p className={cn('font-heading text-xs font-bold', slot.status === 'completed' ? 'text-muted-foreground' : 'text-foreground')}>
                   {slot.time}
@@ -99,20 +99,25 @@ export function ScheduleView({ schedule, showTeacher = true, showClassGroup = fa
                 <p className="text-[10px] text-muted-foreground">{slot.endTime}</p>
               </div>
 
-              {/* Divider */}
+              {/* Divisor */}
               <div className={cn(
                 'w-0.5 h-10 rounded-full',
                 slot.status === 'ongoing' ? 'bg-primary' : slot.status === 'completed' ? 'bg-muted-foreground/20' : 'bg-border'
               )} />
 
-              {/* Content */}
+              {/* Conteúdo */}
               <div className="flex-1 min-w-0">
-                <p className={cn(
-                  'text-sm font-medium truncate',
-                  slot.status === 'completed' ? 'text-muted-foreground' : 'text-foreground'
-                )}>
-                  {slot.subject}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <p className={cn(
+                    'text-sm font-medium truncate',
+                    slot.status === 'completed' ? 'text-muted-foreground' : 'text-foreground'
+                  )}>
+                    {slot.subject}
+                  </p>
+                  {slot.tipo === 'extracurricular' && (
+                    <Sparkles className="h-3 w-3 text-accent-foreground shrink-0" />
+                  )}
+                </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   {showTeacher && (
                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -130,13 +135,13 @@ export function ScheduleView({ schedule, showTeacher = true, showClassGroup = fa
                 </div>
               </div>
 
-              {/* Status */}
+              {/* Estado */}
               <div className="shrink-0">
                 {slot.status === 'ongoing' && (
-                  <span className="rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">LIVE</span>
+                  <span className="rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">A DECORRER</span>
                 )}
                 {slot.status === 'completed' && (
-                  <span className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">Done</span>
+                  <span className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">Concluída</span>
                 )}
                 {slot.status === 'upcoming' && (
                   <ChevronRight className="h-4 w-4 text-muted-foreground/50" />

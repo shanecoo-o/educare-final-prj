@@ -7,13 +7,13 @@ import { ROLE_LABELS, ROLE_HOME } from '@/types/roles';
 import { cn } from '@/lib/utils';
 
 const DEMO_ROLES: { role: UserRole; label: string; description: string; icon: string }[] = [
-  { role: 'student', label: 'Student', description: 'View grades, schedule & fees', icon: '🎓' },
-  { role: 'guardian', label: 'Guardian', description: 'Monitor your children', icon: '👨‍👩‍👧' },
-  { role: 'teacher', label: 'Teacher', description: 'Classes, grading & materials', icon: '📚' },
-  { role: 'pedagogy', label: 'Pedagogy', description: 'Academic coordination', icon: '📊' },
-  { role: 'executive', label: 'Executive', description: 'Administration overview', icon: '🏛️' },
-  { role: 'secretary', label: 'Secretary', description: 'Enrollment & documents', icon: '📋' },
-  { role: 'finance', label: 'Finance', description: 'Treasury & payments', icon: '💰' },
+  { role: 'student', label: 'Aluno', description: 'Notas, horário e finanças', icon: '🎓' },
+  { role: 'guardian', label: 'Encarregado', description: 'Acompanhar os educandos', icon: '👨‍👩‍👧' },
+  { role: 'teacher', label: 'Professor', description: 'Turmas, avaliações e conteúdos', icon: '📚' },
+  { role: 'pedagogy', label: 'Pedagogia', description: 'Coordenação académica', icon: '📊' },
+  { role: 'executive', label: 'Direcção', description: 'Visão institucional', icon: '🏛️' },
+  { role: 'secretary', label: 'Secretaria', description: 'Matrículas e documentos', icon: '📋' },
+  { role: 'finance', label: 'Finanças', description: 'Tesouraria e pagamentos', icon: '💰' },
 ];
 
 export default function LoginPage() {
@@ -31,7 +31,7 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login(email || `demo@school.edu`, password, selectedRole);
+    login(email || `demo@escola.mz`, password, selectedRole);
     navigate(ROLE_HOME[selectedRole], { replace: true });
   };
 
@@ -42,14 +42,14 @@ export default function LoginPage() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary">
             <GraduationCap className="h-6 w-6 text-primary-foreground" />
           </div>
-          <h1 className="font-heading text-xl font-bold text-foreground">Sign in to EDUOS</h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">Select a role to explore the platform</p>
+          <h1 className="font-heading text-xl font-bold text-foreground">Entrar no EDUCORE</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">Seleccione um perfil para explorar a plataforma</p>
         </div>
 
         <form className="space-y-5" onSubmit={handleSubmit}>
-          {/* Role selector pills */}
+          {/* Selector de perfil */}
           <div>
-            <label className="mb-2 block text-xs font-medium text-foreground">Sign in as</label>
+            <label className="mb-2 block text-xs font-medium text-foreground">Entrar como</label>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {DEMO_ROLES.map(({ role: r, label, description, icon }) => (
                 <button
@@ -77,12 +77,12 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@institution.edu"
+              placeholder="nome@escola.mz"
               className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-foreground">Password</label>
+            <label className="mb-1.5 block text-xs font-medium text-foreground">Palavra-passe</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -99,21 +99,21 @@ export default function LoginPage() {
           <div className="flex items-center justify-between text-xs">
             <label className="flex items-center gap-2 text-muted-foreground">
               <input type="checkbox" className="rounded border-input" />
-              Remember me
+              Lembrar-me
             </label>
-            <Link to="/forgot-password" className="font-medium text-primary hover:underline">Forgot password?</Link>
+            <Link to="/forgot-password" className="font-medium text-primary hover:underline">Esqueceu a palavra-passe?</Link>
           </div>
           <button
             type="submit"
             className="flex w-full items-center justify-center rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors active:scale-[0.98]"
           >
-            Sign in as {ROLE_LABELS[selectedRole]}
+            Entrar como {DEMO_ROLES.find(r => r.role === selectedRole)?.label}
           </button>
         </form>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Don't have an account?{' '}
-          <Link to="/apply" className="font-medium text-primary hover:underline">Apply here</Link>
+          Não tem conta?{' '}
+          <Link to="/apply" className="font-medium text-primary hover:underline">Candidatar-se</Link>
         </p>
       </div>
     </div>
