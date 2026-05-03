@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { GraduationCap, ChevronLeft, LogOut, Search, Bell, User, Menu } from 'lucide-react';
+import { ChevronLeft, LogOut, Search, Bell, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROLE_NAVIGATION, ROLE_BOTTOM_NAV } from '@/shared/navigation/roleNavigation';
 import { ROLE_LABELS, ROLE_NOTIFICATIONS } from '@/types/roles';
 import { CommandSearch } from '@/components/search/CommandSearch';
-import type { NavItem } from '@/types/navigation';
+import { Brand } from '@/components/shared/Brand';
 
 export function RoleLayout() {
   const { role, user, logout } = useAuth();
@@ -40,19 +39,15 @@ export function RoleLayout() {
       >
         {/* Logo */}
         <div className="flex h-[var(--topbar-height)] items-center gap-3 border-b border-sidebar-border px-4">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
-            <GraduationCap className="h-4 w-4 text-primary-foreground" />
-          </div>
-          {!collapsed && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-w-0">
-              <span className="font-heading text-base font-bold tracking-tight text-sidebar-foreground block">EDUOS</span>
-              <span className="text-[10px] text-sidebar-foreground/50 block truncate">{roleLabel}</span>
-            </motion.div>
+          {collapsed ? (
+            <Brand variant="mark" size="sm" />
+          ) : (
+            <Brand size="sm" subtitle={roleLabel} />
           )}
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 overflow-y-auto scrollbar-thin px-2 py-3 space-y-1">
+        <nav className="flex-1 overflow-y-auto scrollbar-thin px-3 py-4 space-y-0.5">
           {navItems.map((item) => {
             const active = isActive(item.path);
             return (
@@ -60,13 +55,14 @@ export function RoleLayout() {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                  'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
                   active
-                    ? 'bg-sidebar-accent text-sidebar-primary'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
+                    ? 'bg-sidebar-accent text-sidebar-primary shadow-sm'
+                    : 'text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground'
                 )}
               >
-                <item.icon className={cn('h-[18px] w-[18px] shrink-0', active && 'text-sidebar-primary')} />
+                {active && <span className="absolute left-0 top-1/2 h-5 -translate-y-1/2 w-[3px] rounded-r-full bg-sidebar-primary" />}
+                <item.icon className={cn('h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110', active && 'text-sidebar-primary')} />
                 {!collapsed && <span>{item.label}</span>}
               </Link>
             );
@@ -102,18 +98,18 @@ export function RoleLayout() {
       {/* Topbar */}
       <header
         className={cn(
-          'fixed top-0 right-0 z-30 flex h-[var(--topbar-height)] items-center justify-between border-b border-border bg-background/80 glass px-4 md:px-6 transition-all duration-300',
+          'fixed top-0 right-0 z-30 flex h-[var(--topbar-height)] items-center justify-between border-b border-border/60 bg-background/85 glass px-4 md:px-6 transition-all duration-300',
           collapsed ? 'md:left-[var(--sidebar-collapsed-width)]' : 'md:left-[var(--sidebar-width)]',
           'left-0'
         )}
       >
         <div className="flex items-center gap-3">
-          <div className="md:hidden flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <GraduationCap className="h-4 w-4 text-primary-foreground" />
+          <div className="md:hidden">
+            <Brand variant="mark" size="sm" />
           </div>
           {user && (
-            <div className="hidden sm:block">
-              <p className="text-sm font-medium text-foreground">{user.name}</p>
+            <div className="hidden sm:block leading-tight">
+              <p className="text-sm font-semibold text-foreground">{user.name}</p>
               <p className="text-[10px] text-muted-foreground">{roleLabel}</p>
             </div>
           )}
@@ -121,10 +117,10 @@ export function RoleLayout() {
 
         <div className="hidden md:flex max-w-md flex-1 mx-8">
           <button onClick={() => setSearchOpen(true)} className="relative w-full text-left group">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <div className="w-full rounded-xl border border-border bg-muted/50 py-2 pl-10 pr-4 text-sm text-muted-foreground group-hover:border-primary/20 transition-colors">
-              Pesquisar...
-              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex h-5 items-center gap-1 rounded border border-border bg-card px-1.5 text-[10px] font-medium text-muted-foreground">⌘K</kbd>
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="w-full rounded-xl border border-border bg-muted/40 py-2 pl-10 pr-4 text-sm text-muted-foreground group-hover:border-primary/30 group-hover:bg-muted/70 transition-all">
+              Pesquisar na plataforma…
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex h-5 items-center gap-1 rounded-md border border-border bg-card px-1.5 text-[10px] font-medium text-muted-foreground">⌘K</kbd>
             </div>
           </button>
         </div>
