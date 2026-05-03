@@ -232,7 +232,7 @@ export function FinanceReceipts() {
               <p className="text-xs text-muted-foreground">{p.referencia} · {p.metodo} · {p.paidDate && new Date(p.paidDate).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
             </div>
             <span className="font-heading text-sm font-bold text-foreground">{p.paidAmount.toLocaleString('pt-PT')} MT</span>
-            <button className="rounded-lg bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors active:scale-95">
+            <button onClick={() => toast.success(`Recibo ${p.referencia} descarregado.`)} className="rounded-lg bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors active:scale-95">
               <Download className="h-3 w-3 inline mr-1" />PDF
             </button>
           </div>
