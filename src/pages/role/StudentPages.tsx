@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { SectionHeader } from '@/components/ui/section-header';
 import { ScheduleView } from '@/components/academic/ScheduleView';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { AlertCard } from '@/components/dashboard/AlertCard';
+import { DetailSheet } from '@/components/shared/DetailSheet';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   students, subjects, grades, attendanceRecords, weeklySchedule, payments,
   notifications, feedItems, knowledgeItems,
@@ -14,7 +17,7 @@ import {
 import {
   TrendingUp, CheckCircle, BookOpen, Wallet, Calendar, ClipboardList,
   Clock, FileText, MessageCircle, Bell, GraduationCap,
-  Video, Link as LinkIcon, HelpCircle, Presentation, Filter, Sparkles
+  Video, Link as LinkIcon, HelpCircle, Presentation, Sparkles, Download, Send
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
