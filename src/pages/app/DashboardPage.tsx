@@ -85,7 +85,7 @@ export default function DashboardPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-foreground/60 to-transparent" />
         <div className="absolute bottom-4 left-5 md:bottom-6 md:left-8">
           <h1 className="font-heading text-xl font-bold text-primary-foreground md:text-2xl">Welcome back</h1>
-          <p className="mt-0.5 text-sm text-primary-foreground/80">EDUCORE Dashboard — Everything at a glance</p>
+          <p className="mt-0.5 text-sm text-primary-foreground/80">Educare Smart — Tudo num só lugar</p>
         </div>
       </div>
 

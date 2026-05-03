@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { GraduationCap, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ShieldCheck, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import type { UserRole } from '@/types/roles';
 import { ROLE_HOME } from '@/types/roles';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Brand } from '@/components/shared/Brand';
 
 const DEMO_ROLES: { role: UserRole; label: string; description: string; icon: string }[] = [
   { role: 'student', label: 'Aluno', description: 'Notas, horário e finanças', icon: '🎓' },
@@ -39,25 +40,32 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-6">
-      <div className="w-full max-w-sm animate-fade-in">
-        <div className="mb-5 text-center">
-          <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-primary">
-            <GraduationCap className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <h1 className="font-heading text-xl font-bold text-foreground">Entrar no EDUCORE</h1>
-          <p className="mt-1 text-xs text-muted-foreground">Aceda à sua conta institucional</p>
+    <div className="relative flex min-h-screen items-center justify-center bg-background px-4 py-8 overflow-hidden">
+      {/* Decorative bg */}
+      <div className="absolute inset-0 -z-10" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, hsl(var(--primary-soft)) 0%, transparent 60%)' }} />
+      <div className="absolute -top-32 -right-32 -z-10 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
+
+      <div className="w-full max-w-md animate-fade-in">
+        {/* Brand header */}
+        <div className="mb-6 flex flex-col items-center text-center">
+          <Brand size="lg" variant="mark" />
+          <h1 className="mt-4 font-heading text-2xl font-bold text-foreground">Bem-vindo de volta</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">Aceda à plataforma <span className="font-semibold text-foreground">Educare Smart</span></p>
         </div>
 
-        <form className="space-y-3.5" onSubmit={handleSubmit}>
+        <div className="rounded-2xl border border-border bg-card/80 p-6 shadow-xl backdrop-blur-sm">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Profile combobox */}
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-foreground">Perfil</label>
+            <label className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <span>Perfil de acesso</span>
+              <span className="inline-flex items-center gap-1 text-[10px] font-medium normal-case tracking-normal text-primary"><Sparkles className="h-3 w-3" /> Demo</span>
+            </label>
             <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as UserRole)}>
-              <SelectTrigger className="h-12 rounded-xl border-input">
+              <SelectTrigger className="h-14 rounded-xl border-input bg-background hover:border-primary/40 transition-colors">
                 <SelectValue>
-                  <div className="flex items-center gap-2.5 text-left">
-                    <span className="text-lg leading-none">{current.icon}</span>
+                  <div className="flex items-center gap-3 text-left">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-soft text-base">{current.icon}</span>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-foreground leading-tight">{current.label}</p>
                       <p className="text-[11px] text-muted-foreground leading-tight">{current.description}</p>
@@ -67,9 +75,9 @@ export default function LoginPage() {
               </SelectTrigger>
               <SelectContent className="rounded-xl">
                 {DEMO_ROLES.map(r => (
-                  <SelectItem key={r.role} value={r.role} className="rounded-lg">
+                  <SelectItem key={r.role} value={r.role} className="rounded-lg py-2">
                     <div className="flex items-center gap-2.5">
-                      <span className="text-base">{r.icon}</span>
+                      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-muted text-sm">{r.icon}</span>
                       <div>
                         <p className="text-sm font-medium text-foreground leading-tight">{r.label}</p>
                         <p className="text-[11px] text-muted-foreground leading-tight">{r.description}</p>
@@ -82,47 +90,51 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-foreground">Email</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="nome@escola.mz"
-              className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20"
+              placeholder="nome@educare.co.mz"
+              className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-primary/40 transition-all"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-foreground">Palavra-passe</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Palavra-passe</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-ring/20"
+                className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-primary/40 transition-all"
               />
-              <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
           </div>
           <div className="flex items-center justify-between text-xs">
-            <label className="flex items-center gap-2 text-muted-foreground cursor-pointer">
-              <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} className="rounded border-input" />
-              Lembrar-me
+            <label className="flex items-center gap-2 text-muted-foreground cursor-pointer select-none">
+              <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} className="rounded border-input accent-primary" />
+              Manter sessão iniciada
             </label>
-            <Link to="/forgot-password" className="font-medium text-primary hover:underline">Esqueci-me</Link>
+            <Link to="/forgot-password" className="font-semibold text-primary hover:underline">Esqueci-me</Link>
           </div>
           <button
             type="submit"
-            className="flex w-full items-center justify-center rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors active:scale-[0.98]"
+            className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-md hover:bg-primary-deep transition-all active:scale-[0.98]"
           >
             Entrar como {current.label}
           </button>
         </form>
+        </div>
 
-        <p className="mt-4 text-center text-xs text-muted-foreground">
-          Não tem conta? <Link to="/apply" className="font-medium text-primary hover:underline">Candidatar-se</Link>
+        <div className="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
+          <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Sessão protegida · ambiente institucional
+        </div>
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          Ainda não tem conta? <Link to="/apply" className="font-semibold text-primary hover:underline">Candidatar-se</Link>
         </p>
       </div>
     </div>

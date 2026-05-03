@@ -1,5 +1,4 @@
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   GraduationCap,
@@ -10,9 +9,9 @@ import {
   Bell,
   Settings,
   ChevronLeft,
-  LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Brand } from '@/components/shared/Brand';
 import type { NavItem } from '@/types/navigation';
 
 const mainNav: NavItem[] = [
@@ -51,18 +50,7 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
     >
       {/* Logo */}
       <div className="flex h-[var(--topbar-height)] items-center gap-3 border-b border-sidebar-border px-4">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
-          <GraduationCap className="h-4 w-4 text-primary-foreground" />
-        </div>
-        {!collapsed && (
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="font-heading text-base font-bold tracking-tight text-sidebar-foreground"
-          >
-            EDUCORE
-          </motion.span>
-        )}
+        {collapsed ? <Brand variant="mark" size="sm" /> : <Brand size="sm" />}
       </div>
 
       {/* Main navigation */}
