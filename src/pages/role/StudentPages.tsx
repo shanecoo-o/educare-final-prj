@@ -448,6 +448,9 @@ export function StudentChat() {
 
 /* ─── NOTIFICAÇÕES ─── */
 export function StudentNotifications() {
+  const navigate = useNavigate();
+  const [items, setItems] = useState(notifications);
+
   const typeIcon = (type: string) => {
     switch (type) {
       case 'nota': return <GraduationCap className="h-4 w-4 text-primary" />;
@@ -459,16 +462,26 @@ export function StudentNotifications() {
     }
   };
 
+  const handleClick = (n: typeof notifications[number]) => {
+    setItems(prev => prev.map(x => x.id === n.id ? { ...x, read: true } : x));
+    if (n.type === 'nota') navigate('/app/student/grades');
+    else if (n.type === 'assiduidade') navigate('/app/student/attendance');
+    else if (n.type === 'pagamento') navigate('/app/student/finance');
+    else if (n.type === 'mensagem') navigate('/app/student/chat');
+  };
+
   return (
     <PageContainer>
-      <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Notificações</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Alertas e avisos.</p>
+      <div className="mb-5 flex items-center justify-between">
+        <div>
+          <h1 className="font-heading text-2xl font-bold text-foreground">Notificações</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Alertas e avisos.</p>
+        </div>
+        <button onClick={() => { setItems(prev => prev.map(x => ({ ...x, read: true }))); toast.success('Tudo marcado como lido.'); }} className="text-xs font-medium text-primary hover:underline">Marcar tudo como lido</button>
       </div>
-
       <div className="space-y-1.5">
-        {notifications.map(n => (
-          <div key={n.id} className={cn('flex items-start gap-3 rounded-xl border px-4 py-3 transition-all', n.read ? 'border-border bg-card' : 'border-primary/20 bg-primary/[0.02]')}>
+        {items.map(n => (
+          <button key={n.id} onClick={() => handleClick(n)} className={cn('w-full text-left flex items-start gap-3 rounded-xl border px-4 py-3 transition-all hover:shadow-sm', n.read ? 'border-border bg-card' : 'border-primary/20 bg-primary/[0.02]')}>
             <div className="mt-0.5 shrink-0">{typeIcon(n.type)}</div>
             <div className="flex-1 min-w-0">
               <p className={cn('text-sm', n.read ? 'text-foreground' : 'font-medium text-foreground')}>{n.title}</p>
@@ -476,7 +489,7 @@ export function StudentNotifications() {
               <p className="text-[10px] text-muted-foreground mt-1">{new Date(n.timestamp).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
             </div>
             {!n.read && <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />}
-          </div>
+          </button>
         ))}
       </div>
     </PageContainer>
