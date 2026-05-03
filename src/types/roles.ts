@@ -17,13 +17,13 @@ export interface UserProfile {
 }
 
 export const ROLE_LABELS: Record<UserRole, string> = {
-  student: 'Student',
-  guardian: 'Guardian',
-  teacher: 'Teacher',
-  pedagogy: 'Academic Coordination',
-  executive: 'Administration',
-  secretary: 'Secretary',
-  finance: 'Finance & Treasury',
+  student: 'Aluno',
+  guardian: 'Encarregado',
+  teacher: 'Professor',
+  pedagogy: 'Pedagogia',
+  executive: 'Direcção',
+  secretary: 'Secretaria',
+  finance: 'Finanças',
 };
 
 export const ROLE_HOME: Record<UserRole, string> = {
@@ -34,4 +34,10 @@ export const ROLE_HOME: Record<UserRole, string> = {
   executive: '/app/executive/dashboard',
   secretary: '/app/secretary/dashboard',
   finance: '/app/finance/dashboard',
+};
+
+export const ROLE_NOTIFICATIONS: Partial<Record<UserRole, string>> = {
+  student: '/app/student/notifications',
+  guardian: '/app/guardian/notifications',
+  teacher: '/app/teacher/notifications',
 };
