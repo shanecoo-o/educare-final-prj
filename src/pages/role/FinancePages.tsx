@@ -19,7 +19,9 @@ export { FinanceAdminDashboard as FinanceDashboard } from '@/pages/app/RoleDashb
 
 /* ─── PAGAMENTOS ─── */
 export function FinancePayments() {
-  const sorted = [...payments].sort((a, b) => {
+  const [filter, setFilter] = useState<string>('all');
+  const filtered = paymentsSeed.filter(p => filter === 'all' ? true : p.status === filter);
+  const sorted = [...filtered].sort((a, b) => {
     const order: Record<string, number> = { atrasado: 0, em_revisao: 1, parcial: 2, pendente: 3, rejeitado: 4, pago: 5, validado: 6 };
     return (order[a.status] ?? 9) - (order[b.status] ?? 9);
   });
@@ -28,22 +30,30 @@ export function FinancePayments() {
 
   return (
     <PageContainer>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="font-heading text-2xl font-bold text-foreground">Pagamentos</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Acompanhar e gerir todas as transacções.</p>
-        </div>
-        <button className="flex items-center gap-2 rounded-xl bg-muted px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors">
-          <Filter className="h-3.5 w-3.5" />
-          Filtrar
-        </button>
+      <div className="mb-5">
+        <h1 className="font-heading text-2xl font-bold text-foreground">Pagamentos</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Acompanhar e gerir todas as transacções.</p>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatsCard label="Total" value={payments.length} icon={FileText} variant="primary" />
+      <div className="mb-4 max-w-xs">
+        <Select value={filter} onValueChange={setFilter}>
+          <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os estados</SelectItem>
+            <SelectItem value="atrasado">Atrasados</SelectItem>
+            <SelectItem value="em_revisao">Em revisão</SelectItem>
+            <SelectItem value="pendente">Pendentes</SelectItem>
+            <SelectItem value="validado">Validados</SelectItem>
+            <SelectItem value="rejeitado">Rejeitados</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatsCard label="Total" value={paymentsSeed.length} icon={FileText} variant="primary" />
         <StatsCard label="A Validar" value={financeStats.pendentesValidacao} icon={Clock} />
-        <StatsCard label="Atrasados" value={payments.filter(p => p.status === 'atrasado').length} icon={AlertTriangle} />
-        <StatsCard label="Validados" value={payments.filter(p => p.status === 'validado').length} icon={CheckCircle} />
+        <StatsCard label="Atrasados" value={paymentsSeed.filter(p => p.status === 'atrasado').length} icon={AlertTriangle} />
+        <StatsCard label="Validados" value={paymentsSeed.filter(p => p.status === 'validado').length} icon={CheckCircle} />
       </div>
 
       <div className="space-y-1.5">
@@ -60,6 +70,7 @@ export function FinancePayments() {
             <StatusBadge label={statusLabel(p.status)} variant={p.status === 'pago' || p.status === 'validado' ? 'success' : p.status === 'atrasado' || p.status === 'rejeitado' ? 'destructive' : p.status === 'em_revisao' ? 'info' : p.status === 'parcial' ? 'warning' : 'muted'} />
           </div>
         ))}
+        {sorted.length === 0 && <p className="text-center text-sm text-muted-foreground py-6">Sem pagamentos para este filtro.</p>}
       </div>
     </PageContainer>
   );
@@ -67,21 +78,37 @@ export function FinancePayments() {
 
 /* ─── VALIDAÇÃO ─── */
 export function FinanceValidation() {
-  const pendingValidation = payments.filter(p => p.status === 'em_revisao');
+  const [list, setList] = useState(paymentsSeed.filter(p => p.status === 'em_revisao'));
+
+  const decide = (id: string, decision: 'validar' | 'rejeitar') => {
+    setList(prev => prev.filter(p => p.id !== id));
+    toast.success(decision === 'validar' ? 'Pagamento validado.' : 'Pagamento rejeitado.');
+  };
+  const validateAll = () => {
+    const n = list.length;
+    setList([]);
+    toast.success(`${n} pagamento(s) validado(s) em lote.`);
+  };
 
   return (
     <PageContainer>
-      <div className="mb-6">
+      <div className="mb-5">
         <h1 className="font-heading text-2xl font-bold text-foreground">Validação de Pagamentos</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Validar submissões de pagamento pendentes.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Validar submissões pendentes.</p>
       </div>
 
-      {pendingValidation.length > 0 && (
-        <AlertCard title={`${pendingValidation.length} pagamento(s) a aguardar validação`} description="Reveja e confirme ou rejeite os pagamentos submetidos." variant="info" action="Validar em Lote" className="mb-6" />
+      {list.length > 0 ? (
+        <AlertCard title={`${list.length} pagamento(s) a aguardar`} description="Reveja, confirme ou rejeite as submissões." variant="info" action="Validar em lote" onAction={validateAll} className="mb-6" />
+      ) : (
+        <div className="rounded-2xl border border-border bg-card p-8 text-center mb-6">
+          <CheckCircle className="mx-auto h-8 w-8 text-success mb-2" />
+          <p className="text-sm font-medium text-foreground">Sem pagamentos a validar</p>
+          <p className="text-xs text-muted-foreground mt-1">Tudo em dia 🎉</p>
+        </div>
       )}
 
       <div className="space-y-2">
-        {pendingValidation.map(p => (
+        {list.map(p => (
           <div key={p.id} className="rounded-xl border border-info/20 bg-info/[0.02] p-4">
             <div className="flex items-center justify-between mb-2">
               <div>
@@ -91,10 +118,10 @@ export function FinanceValidation() {
               <span className="font-heading text-base font-bold text-foreground">{p.paidAmount.toLocaleString('pt-PT')} MT</span>
             </div>
             <div className="flex gap-2">
-              <button className="rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-success-foreground hover:bg-success/90 transition-colors active:scale-95">
+              <button onClick={() => decide(p.id, 'validar')} className="rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-success-foreground hover:bg-success/90 transition-colors active:scale-95">
                 <CheckCircle className="h-3 w-3 inline mr-1" />Validar
               </button>
-              <button className="rounded-lg bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors active:scale-95">
+              <button onClick={() => decide(p.id, 'rejeitar')} className="rounded-lg bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground hover:bg-destructive/90 transition-colors active:scale-95">
                 Rejeitar
               </button>
             </div>
@@ -104,8 +131,6 @@ export function FinanceValidation() {
     </PageContainer>
   );
 }
-
-/* ─── OBRIGAÇÕES ─── */
 export function FinanceObligations() {
   const statusVariant = (s: string) => s === 'pago' ? 'success' as const : s === 'atrasado' ? 'destructive' as const : 'muted' as const;
   const statusLabel = (s: string) => s === 'pago' ? 'Pago' : s === 'atrasado' ? 'Atrasado' : 'Activo';
