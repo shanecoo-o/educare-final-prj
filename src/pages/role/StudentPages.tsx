@@ -498,26 +498,35 @@ export function StudentNotifications() {
 
 /* ─── FINANÇAS ─── */
 export function StudentFinance() {
-  const pending = studentPayments.filter(p => ['pendente', 'atrasado', 'parcial'].includes(p.status));
-  const history = studentPayments.filter(p => ['pago', 'validado'].includes(p.status));
+  const [payList, setPayList] = useState(studentPayments);
+  const [active, setActive] = useState<typeof studentPayments[number] | null>(null);
+  const pending = payList.filter(p => ['pendente', 'atrasado', 'parcial'].includes(p.status));
+  const history = payList.filter(p => ['pago', 'validado', 'em_revisao'].includes(p.status));
   const totalDue = pending.reduce((s, p) => s + (p.amount - p.paidAmount), 0);
   const hasDebt = pending.some(p => p.status === 'atrasado');
 
-  const statusVariant = (s: string) => s === 'pago' || s === 'validado' ? 'success' as const : s === 'atrasado' ? 'destructive' as const : s === 'parcial' ? 'warning' as const : 'muted' as const;
-  const statusLabel = (s: string) => s === 'pago' ? 'Pago' : s === 'validado' ? 'Validado' : s === 'atrasado' ? 'Atrasado' : s === 'parcial' ? 'Parcial' : 'Pendente';
+  const statusVariant = (s: string) => s === 'pago' || s === 'validado' ? 'success' as const : s === 'atrasado' ? 'destructive' as const : s === 'parcial' ? 'warning' as const : s === 'em_revisao' ? 'info' as const : 'muted' as const;
+  const statusLabel = (s: string) => s === 'pago' ? 'Pago' : s === 'validado' ? 'Validado' : s === 'atrasado' ? 'Atrasado' : s === 'parcial' ? 'Parcial' : s === 'em_revisao' ? 'Em revisão' : 'Pendente';
+
+  const submitPayment = () => {
+    if (!active) return;
+    setPayList(prev => prev.map(p => p.id === active.id ? { ...p, status: 'em_revisao', paidAmount: p.amount, paidDate: new Date().toISOString().slice(0, 10), metodo: 'M-Pesa', referencia: 'REF-' + Math.random().toString(36).slice(2, 7).toUpperCase() } : p));
+    toast.success('Pagamento submetido. A aguardar validação.');
+    setActive(null);
+  };
 
   return (
     <PageContainer>
-      <div className="mb-6">
+      <div className="mb-5">
         <h1 className="font-heading text-2xl font-bold text-foreground">As Minhas Finanças</h1>
         <p className="mt-1 text-sm text-muted-foreground">Propinas, pagamentos e recibos.</p>
       </div>
 
       {hasDebt && (
-        <AlertCard title="⚠️ Situação financeira bloqueada" description="Tem pagamentos em atraso. Regularize a situação para evitar penalizações." variant="destructive" className="mb-4" />
+        <AlertCard title="Pagamentos em atraso" description="Regularize a situação para evitar penalizações." variant="destructive" className="mb-4" />
       )}
 
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <StatsCard label="Total em Dívida" value={`${totalDue.toLocaleString('pt-PT')} MT`} icon={Wallet} variant="primary" />
         <StatsCard label="Em Atraso" value={`${pending.filter(p => p.status === 'atrasado').reduce((s, p) => s + p.amount, 0).toLocaleString('pt-PT')} MT`} icon={Clock} />
         <StatsCard label="Pago Este Ano" value={`${history.reduce((s, p) => s + p.paidAmount, 0).toLocaleString('pt-PT')} MT`} icon={CheckCircle} />
@@ -532,24 +541,64 @@ export function StudentFinance() {
               <p className="text-xs text-muted-foreground">Venc. {new Date(p.dueDate).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })}</p>
             </div>
             <span className={cn('font-heading text-sm font-bold', p.status === 'atrasado' ? 'text-destructive' : 'text-foreground')}>{p.amount.toLocaleString('pt-PT')} MT</span>
-            <StatusBadge label={statusLabel(p.status)} variant={statusVariant(p.status)} />
+            <button onClick={() => setActive(p)} className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors active:scale-95">
+              Pagar
+            </button>
           </div>
         ))}
+        {pending.length === 0 && <p className="text-center text-sm text-muted-foreground py-6">Sem obrigações pendentes 🎉</p>}
       </div>
 
-      <SectionHeader title="Histórico de Pagamentos" className="mb-3" />
+      <SectionHeader title="Histórico" className="mb-3" />
       <div className="space-y-1.5">
         {history.map(p => (
           <div key={p.id} className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3">
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground">{p.conceito}</p>
-              <p className="text-xs text-muted-foreground">Pago {p.paidDate && new Date(p.paidDate).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })} · {p.metodo}</p>
+              <p className="text-xs text-muted-foreground">{p.paidDate && new Date(p.paidDate).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })} · {p.metodo}</p>
             </div>
             <span className="font-heading text-sm font-bold text-foreground">{p.paidAmount.toLocaleString('pt-PT')} MT</span>
-            <StatusBadge label="Pago" variant="success" />
+            <StatusBadge label={statusLabel(p.status)} variant={statusVariant(p.status)} />
+            {(p.status === 'pago' || p.status === 'validado') && (
+              <button onClick={() => toast.success('A descarregar recibo PDF…')} className="rounded-lg bg-muted px-2 py-1 text-xs font-medium text-foreground hover:bg-muted/80"><Download className="h-3 w-3" /></button>
+            )}
           </div>
         ))}
       </div>
+
+      <DetailSheet
+        open={!!active}
+        onOpenChange={(o) => !o && setActive(null)}
+        title="Efectuar pagamento"
+        description={active?.conceito}
+        footer={
+          <button onClick={submitPayment} className="w-full rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
+            Confirmar pagamento de {active?.amount.toLocaleString('pt-PT')} MT
+          </button>
+        }
+      >
+        {active && (
+          <div className="space-y-4">
+            <div className="rounded-xl bg-muted/40 p-4">
+              <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Valor</span><span className="font-heading text-lg font-bold text-foreground">{active.amount.toLocaleString('pt-PT')} MT</span></div>
+              <div className="flex items-center justify-between text-xs mt-1"><span className="text-muted-foreground">Vencimento</span><span className="text-foreground">{new Date(active.dueDate).toLocaleDateString('pt-PT')}</span></div>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-foreground">Método de pagamento</label>
+              <Select defaultValue="mpesa">
+                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mpesa">M-Pesa</SelectItem>
+                  <SelectItem value="emola">e-Mola</SelectItem>
+                  <SelectItem value="transfer">Transferência bancária</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <input placeholder="Número de telefone" className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm" />
+            <p className="text-[11px] text-muted-foreground">Receberá uma confirmação após validação pelo departamento financeiro.</p>
+          </div>
+        )}
+      </DetailSheet>
     </PageContainer>
   );
 }
