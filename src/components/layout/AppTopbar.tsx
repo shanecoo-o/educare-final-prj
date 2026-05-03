@@ -47,8 +47,8 @@ export function AppTopbar({ sidebarCollapsed, pageTitle }: AppTopbarProps) {
             className="relative w-full text-left group"
           >
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <div className="w-full rounded-xl border border-border bg-muted/50 py-2 pl-10 pr-4 text-sm text-muted-foreground group-hover:border-primary/20 transition-colors">
-              Search anything...
+            <div className="w-full rounded-xl border border-border bg-muted/40 py-2 pl-10 pr-4 text-sm text-muted-foreground group-hover:border-primary/30 group-hover:bg-muted/70 transition-all">
+              Pesquisar na plataforma…
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex h-5 items-center gap-1 rounded border border-border bg-card px-1.5 text-[10px] font-medium text-muted-foreground">⌘K</kbd>
             </div>
           </button>
