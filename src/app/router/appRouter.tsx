@@ -7,7 +7,10 @@ import NotFound from '@/pages/NotFound';
 
 // Public
 import LandingPage from '@/pages/public/LandingPage';
+import { FeaturesPage, ContactPage, ApplyPage, ApplyStatusPage } from '@/pages/public/PublicPages';
 import LoginPage from '@/pages/auth/LoginPage';
+import { ForgotPasswordPage, ResetPasswordPage } from '@/pages/auth/PasswordPages';
+import { AppRedirect } from '@/app/router/AppRedirect';
 
 // Shared
 import SettingsPage from '@/pages/app/SettingsPage';
@@ -39,20 +42,21 @@ export function AppRouter() {
       {/* ─── Public ─── */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/features" element={<LandingPage />} />
-        <Route path="/contact" element={<LandingPage />} />
-        <Route path="/apply" element={<LandingPage />} />
-        <Route path="/apply/status" element={<LandingPage />} />
+        <Route path="/features" element={<FeaturesPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/apply" element={<ApplyPage />} />
+        <Route path="/apply/status" element={<ApplyStatusPage />} />
       </Route>
 
       {/* ─── Auth ─── */}
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/forgot-password" element={<LoginPage />} />
-      <Route path="/reset-password" element={<LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
       {/* ─── Authenticated ─── */}
       <Route element={<AuthGuard />}>
         <Route path="/app" element={<RoleLayout />}>
+          <Route index element={<AppRedirect />} />
           {/* Shared */}
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<SettingsPage />} />
