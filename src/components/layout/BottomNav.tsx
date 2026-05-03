@@ -9,11 +9,11 @@ import {
 import { cn } from '@/lib/utils';
 
 const items = [
-  { label: 'Home', path: '/app', icon: LayoutDashboard },
-  { label: 'Academic', path: '/app/academic', icon: GraduationCap },
-  { label: 'Finance', path: '/app/finance', icon: Wallet },
+  { label: 'Início', path: '/app', icon: LayoutDashboard },
+  { label: 'Académico', path: '/app/academic', icon: GraduationCap },
+  { label: 'Finanças', path: '/app/finance', icon: Wallet },
   { label: 'Chat', path: '/app/chat', icon: MessageCircle },
-  { label: 'More', path: '/app/menu', icon: Menu },
+  { label: 'Mais', path: '/app/menu', icon: Menu },
 ];
 
 export function BottomNav() {
@@ -26,7 +26,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 glass md:hidden">
-      <div className="flex h-[var(--bottom-nav-height)] items-end justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+      <div className="flex h-[var(--bottom-nav-height)] items-stretch justify-around px-1 pb-[env(safe-area-inset-bottom)]">
         {items.map((item) => {
           const active = isActive(item.path);
           return (
@@ -34,11 +34,12 @@ export function BottomNav() {
               key={item.path}
               to={item.path}
               className={cn(
-                'flex flex-col items-center gap-0.5 py-2 px-3 text-[10px] font-medium transition-colors',
-                active ? 'text-primary' : 'text-muted-foreground'
+                'relative flex flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium transition-all',
+                active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              <item.icon className={cn('h-5 w-5', active && 'text-primary')} />
+              {active && <span className="absolute top-0 h-[3px] w-8 rounded-b-full bg-primary" />}
+              <item.icon className={cn('h-[20px] w-[20px] transition-transform', active && 'scale-110')} />
               <span>{item.label}</span>
             </Link>
           );
