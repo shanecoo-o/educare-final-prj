@@ -214,7 +214,7 @@ export function FinanceAccounts() {
 
 /* ─── RECIBOS ─── */
 export function FinanceReceipts() {
-  const paidPayments = payments.filter(p => ['pago', 'validado'].includes(p.status));
+  const paidPayments = paymentsSeed.filter(p => ['pago', 'validado'].includes(p.status));
 
   return (
     <PageContainer>
@@ -244,7 +244,7 @@ export function FinanceReceipts() {
 
 /* ─── MULTAS ─── */
 export function FinancePenalties() {
-  const overduePayments = payments.filter(p => p.status === 'atrasado');
+  const overduePayments = paymentsSeed.filter(p => p.status === 'atrasado');
 
   return (
     <PageContainer>
@@ -276,8 +276,8 @@ export function FinancePenalties() {
 
 /* ─── TESOURARIA ─── */
 export function FinanceTreasury() {
-  const totalInflow = payments.filter(p => ['pago', 'validado'].includes(p.status)).reduce((s, p) => s + p.paidAmount, 0);
-  const totalOutstanding = payments.filter(p => ['pendente', 'atrasado', 'parcial'].includes(p.status)).reduce((s, p) => s + (p.amount - p.paidAmount), 0);
+  const totalInflow = paymentsSeed.filter(p => ['pago', 'validado'].includes(p.status)).reduce((s, p) => s + p.paidAmount, 0);
+  const totalOutstanding = paymentsSeed.filter(p => ['pendente', 'atrasado', 'parcial'].includes(p.status)).reduce((s, p) => s + (p.amount - p.paidAmount), 0);
 
   return (
     <PageContainer>
