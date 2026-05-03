@@ -1,7 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { GraduationCap, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
+import { Brand } from '@/components/shared/Brand';
 
 const navItems = [
   { to: '/features', label: 'Funcionalidades' },
@@ -11,13 +12,8 @@ const navItems = [
 
 export function PublicNav() {
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-background/80 backdrop-blur px-4 py-3 md:px-12">
-      <Link to="/" className="flex items-center gap-2.5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
-          <GraduationCap className="h-4 w-4 text-primary-foreground" />
-        </div>
-        <span className="font-heading text-base font-bold text-foreground">EDUCORE</span>
-      </Link>
+    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border/60 bg-background/80 backdrop-blur-md px-4 py-3 md:px-12">
+      <Brand to="/" size="sm" />
       <nav className="hidden md:flex items-center gap-1">
         {navItems.map(n => (
           <Link key={n.to} to={n.to} className="rounded-lg px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
@@ -27,7 +23,7 @@ export function PublicNav() {
       </nav>
       <div className="flex items-center gap-2">
         <Link to="/login" className="rounded-xl px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted transition-colors">Entrar</Link>
-        <Link to="/apply" className="hidden sm:inline-flex items-center gap-1 rounded-xl bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
+        <Link to="/apply" className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground hover:bg-primary-deep transition-colors">
           Começar <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
@@ -37,16 +33,13 @@ export function PublicNav() {
 
 export function PublicFooter() {
   return (
-    <footer className="border-t border-border bg-muted/30 px-4 py-8 md:px-12">
-      <div className="mx-auto flex max-w-5xl flex-col gap-4 text-center md:flex-row md:items-center md:justify-between md:text-left">
-        <div className="flex items-center justify-center gap-2 md:justify-start">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
-            <GraduationCap className="h-3.5 w-3.5 text-primary-foreground" />
-          </div>
-          <span className="font-heading text-sm font-bold text-foreground">EDUCORE</span>
-          <span className="text-xs text-muted-foreground">© 2026</span>
+    <footer className="border-t border-border bg-secondary/40 px-4 py-10 md:px-12">
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 text-center md:flex-row md:items-center md:justify-between md:text-left">
+        <div className="flex items-center justify-center gap-3 md:justify-start">
+          <Brand size="sm" />
+          <span className="text-xs text-muted-foreground">© 2026 Colégio Educare</span>
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
           <Link to="/features" className="hover:text-foreground">Funcionalidades</Link>
           <Link to="/contact" className="hover:text-foreground">Contacto</Link>
           <Link to="/apply" className="hover:text-foreground">Candidatura</Link>
@@ -74,7 +67,7 @@ export function FeaturesPage() {
         <div className="mx-auto max-w-5xl">
           <div className="text-center mb-10">
             <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Uma plataforma. Todos os perfis.</h1>
-            <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">O EDUCORE conecta alunos, famílias, professores e administração num único sistema, adaptado ao modelo escolar moçambicano.</p>
+            <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">A Educare Smart conecta alunos, famílias, professores e administração num único sistema, adaptado ao modelo escolar moçambicano.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {personas.map(p => (
@@ -124,10 +117,10 @@ export function ContactPage() {
             {[
               { label: 'Endereço', value: 'Av. Eduardo Mondlane, 1234, Maputo' },
               { label: 'Telefone', value: '+258 21 123 456' },
-              { label: 'Email', value: 'apoio@educore.mz' },
+              { label: 'Email', value: 'apoio@educare.co.mz' },
               { label: 'Horário', value: 'Seg–Sex · 08h00–17h00' },
               { label: 'Suporte', value: 'WhatsApp +258 84 999 0000' },
-              { label: 'Comercial', value: 'comercial@educore.mz' },
+              { label: 'Comercial', value: 'comercial@educare.co.mz' },
             ].map(c => (
               <div key={c.label} className="rounded-xl border border-border bg-card p-4">
                 <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{c.label}</p>
