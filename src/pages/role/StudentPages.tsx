@@ -229,6 +229,7 @@ export function StudentAgenda() {
 /* ─── CONTEÚDOS ─── */
 export function StudentKnowledge() {
   const [filter, setFilter] = useState<string>('all');
+  const [active, setActive] = useState<typeof knowledgeItems[number] | null>(null);
   const disciplinaNames = [...new Set(knowledgeItems.map(k => k.disciplina))];
   const filtered = filter === 'all' ? knowledgeItems : knowledgeItems.filter(k => k.disciplina === filter);
 
@@ -242,23 +243,37 @@ export function StudentKnowledge() {
     }
   };
 
+  const handleAction = (item: typeof knowledgeItems[number]) => {
+    if (item.type === 'video') toast.success('A abrir vídeo…');
+    else if (item.type === 'link') toast.success('A abrir ligação externa…');
+    else if (item.type === 'questionario') toast.success('A iniciar questionário…');
+    else toast.success('A descarregar documento…');
+  };
+
   return (
     <PageContainer>
-      <div className="mb-6">
+      <div className="mb-5">
         <h1 className="font-heading text-2xl font-bold text-foreground">Conteúdos</h1>
         <p className="mt-1 text-sm text-muted-foreground">Materiais de aprendizagem e recursos.</p>
       </div>
 
-      <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
-        <button onClick={() => setFilter('all')} className={cn('rounded-lg px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap', filter === 'all' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground')}>Todas</button>
-        {disciplinaNames.map(s => (
-          <button key={s} onClick={() => setFilter(s)} className={cn('rounded-lg px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap', filter === s ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground')}>{s}</button>
-        ))}
+      <div className="mb-4 max-w-xs">
+        <Select value={filter} onValueChange={setFilter}>
+          <SelectTrigger className="rounded-xl"><SelectValue placeholder="Filtrar disciplina" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas as disciplinas</SelectItem>
+            {disciplinaNames.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {filtered.map(item => (
-          <div key={item.id} className="rounded-2xl border border-border bg-card p-4 hover:shadow-sm hover:border-primary/10 transition-all cursor-pointer active:scale-[0.99]">
+          <button
+            key={item.id}
+            onClick={() => setActive(item)}
+            className="text-left rounded-2xl border border-border bg-card p-4 hover:shadow-sm hover:border-primary/10 transition-all active:scale-[0.99]"
+          >
             <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 {typeIcon(item.type)}
@@ -273,10 +288,56 @@ export function StudentKnowledge() {
                 </div>
               </div>
             </div>
-          </div>
+          </button>
         ))}
       </div>
+
+      <DetailSheet
+        open={!!active}
+        onOpenChange={(o) => !o && setActive(null)}
+        title={active?.title ?? ''}
+        description={active ? `${active.disciplina} · ${active.author}` : ''}
+        footer={active && (
+          <button onClick={() => { handleAction(active); setActive(null); }} className="w-full rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+            {active.type === 'video' ? <><Video className="h-4 w-4" /> Reproduzir</> : active.type === 'link' ? <><LinkIcon className="h-4 w-4" /> Abrir ligação</> : active.type === 'questionario' ? <><HelpCircle className="h-4 w-4" /> Iniciar</> : <><Download className="h-4 w-4" /> Descarregar</>}
+          </button>
+        )}
+      >
+        {active && (
+          <div className="space-y-3">
+            <div className="aspect-video rounded-xl bg-muted/50 flex items-center justify-center text-muted-foreground">
+              {typeIcon(active.type)}
+              <span className="ml-2 text-xs">{active.type === 'video' ? 'Pré-visualização do vídeo' : 'Pré-visualização'}</span>
+            </div>
+            <p className="text-sm text-foreground">{active.description}</p>
+            {active.size && <p className="text-xs text-muted-foreground">Tamanho: {active.size}</p>}
+          </div>
+        )}
+      </DetailSheet>
     </PageContainer>
+  );
+}
+
+/* ─── ACTUALIZAÇÕES (FEED) ─── */
+function FeedItemView({ item, onOpen }: { item: typeof feedItems[number]; onOpen: () => void }) {
+  return (
+    <button onClick={onOpen} className={cn('w-full text-left rounded-2xl border bg-card p-5 transition-all hover:shadow-sm', item.pinned ? 'border-primary/20 bg-primary/[0.02]' : 'border-border')}>
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-bold text-foreground">{item.author[0]}</div>
+          <div>
+            <p className="text-sm font-medium text-foreground">{item.author}</p>
+            <p className="text-[10px] text-muted-foreground">{item.authorRole} · {new Date(item.timestamp).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric' })}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          {item.pinned && <StatusBadge label="Fixo" variant="primary" />}
+          <StatusBadge label={item.category === 'aviso' ? 'Aviso' : item.category === 'evento' ? 'Evento' : item.category === 'academico' ? 'Académico' : 'Geral'} variant={item.category === 'aviso' ? 'info' : item.category === 'evento' ? 'warning' : 'muted'} />
+        </div>
+      </div>
+      <h3 className="font-heading text-sm font-semibold text-foreground mb-1">{item.title}</h3>
+      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{item.content}</p>
+    </button>
   );
 }
 
