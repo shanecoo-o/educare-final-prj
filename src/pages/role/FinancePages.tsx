@@ -1,16 +1,17 @@
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { SectionHeader } from '@/components/ui/section-header';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { AlertCard } from '@/components/dashboard/AlertCard';
-import { InvoiceCard } from '@/components/finance/InvoiceCard';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
-  payments, obligations, financeAccounts, financeStats
+  payments as paymentsSeed, obligations, financeAccounts, financeStats
 } from '@/data/mockData';
 import {
   Wallet, CheckCircle, AlertTriangle, Clock, FileText, BarChart3,
-  Receipt, TrendingUp, ArrowDownRight, ArrowUpRight,
-  Filter, Download
+  Receipt, TrendingUp, ArrowDownRight, ArrowUpRight, Download
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
