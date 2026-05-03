@@ -343,34 +343,42 @@ function FeedItemView({ item, onOpen }: { item: typeof feedItems[number]; onOpen
 
 /* ─── ACTUALIZAÇÕES ─── */
 export function StudentFeed() {
+  const [active, setActive] = useState<typeof feedItems[number] | null>(null);
+  const [liked, setLiked] = useState<Record<string, boolean>>({});
   return (
     <PageContainer>
-      <div className="mb-6">
+      <div className="mb-5">
         <h1 className="font-heading text-2xl font-bold text-foreground">Actualizações</h1>
         <p className="mt-1 text-sm text-muted-foreground">Últimas novidades da escola.</p>
       </div>
-
       <div className="space-y-3">
         {feedItems.map(item => (
-          <div key={item.id} className={cn('rounded-2xl border bg-card p-5 transition-all', item.pinned ? 'border-primary/20 bg-primary/[0.02]' : 'border-border')}>
-            <div className="flex items-start justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-bold text-foreground">{item.author[0]}</div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">{item.author}</p>
-                  <p className="text-[10px] text-muted-foreground">{item.authorRole} · {new Date(item.timestamp).toLocaleDateString('pt-PT', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5">
-                {item.pinned && <StatusBadge label="Fixo" variant="primary" />}
-                <StatusBadge label={item.category === 'aviso' ? 'Aviso' : item.category === 'evento' ? 'Evento' : item.category === 'academico' ? 'Académico' : 'Geral'} variant={item.category === 'aviso' ? 'info' : item.category === 'evento' ? 'warning' : 'muted'} />
-              </div>
-            </div>
-            <h3 className="font-heading text-sm font-semibold text-foreground mb-1">{item.title}</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{item.content}</p>
-          </div>
+          <FeedItemView key={item.id} item={item} onOpen={() => setActive(item)} />
         ))}
       </div>
+      <DetailSheet
+        open={!!active}
+        onOpenChange={(o) => !o && setActive(null)}
+        title={active?.title ?? ''}
+        description={active ? `${active.author} · ${active.authorRole}` : ''}
+      >
+        {active && (
+          <div className="space-y-4">
+            <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{active.content}</p>
+            <div className="flex items-center gap-2">
+              <button onClick={() => { setLiked(p => ({ ...p, [active.id]: !p[active.id] })); toast.success(liked[active.id] ? 'Reacção removida' : 'Reagiu 👍'); }} className={cn('rounded-full border px-3 py-1.5 text-xs font-medium transition-colors', liked[active.id] ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-foreground hover:bg-muted')}>
+                👍 Gosto
+              </button>
+              <button onClick={() => toast.success('Comentário enviado.')} className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted">💬 Comentar</button>
+            </div>
+            <div className="rounded-xl border border-border bg-muted/30 p-3 space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Comentários</p>
+              <div className="text-xs text-foreground"><span className="font-medium">Joana M.</span> · Excelente notícia!</div>
+              <div className="text-xs text-foreground"><span className="font-medium">Carlos S.</span> · A confirmar presença.</div>
+            </div>
+          </div>
+        )}
+      </DetailSheet>
     </PageContainer>
   );
 }
@@ -378,24 +386,34 @@ export function StudentFeed() {
 /* ─── CHAT ─── */
 export function StudentChat() {
   const conversations = [
-    { name: 'Prof. António Magaia', lastMessage: 'Excelente desempenho na ACS1!', time: '2h atrás', unread: 1 },
-    { name: 'Prof.ª Graça Machel', lastMessage: 'Não se esqueça do relatório #5', time: '1d atrás', unread: 0 },
-    { name: 'Prof. Ernesto Vilankulo', lastMessage: 'Detalhes da visita de estudo', time: '2d atrás', unread: 0 },
-    { name: 'Turma 11ª A', lastMessage: 'Alguém tem apontamentos de Quarta?', time: '3h atrás', unread: 3 },
+    { id: 'c1', name: 'Prof. António Magaia', lastMessage: 'Excelente desempenho na ACS1!', time: '2h atrás', unread: 1 },
+    { id: 'c2', name: 'Prof.ª Graça Machel', lastMessage: 'Não se esqueça do relatório #5', time: '1d atrás', unread: 0 },
+    { id: 'c3', name: 'Prof. Ernesto Vilankulo', lastMessage: 'Detalhes da visita de estudo', time: '2d atrás', unread: 0 },
+    { id: 'c4', name: 'Turma 11ª A', lastMessage: 'Alguém tem apontamentos de Quarta?', time: '3h atrás', unread: 3 },
   ];
+  const [open, setOpen] = useState<typeof conversations[number] | null>(null);
+  const [draft, setDraft] = useState('');
+  const [thread, setThread] = useState<{ from: 'me' | 'them'; text: string }[]>([
+    { from: 'them', text: 'Olá! Como posso ajudar?' },
+  ]);
+  const send = () => {
+    if (!draft.trim()) return;
+    setThread(t => [...t, { from: 'me', text: draft }]);
+    setDraft('');
+    toast.success('Mensagem enviada.');
+  };
 
   return (
     <PageContainer>
-      <div className="mb-6">
+      <div className="mb-5">
         <h1 className="font-heading text-2xl font-bold text-foreground">Chat</h1>
         <p className="mt-1 text-sm text-muted-foreground">Mensagens com professores e colegas.</p>
       </div>
-
       <div className="space-y-1.5">
-        {conversations.map((c, i) => (
-          <div key={i} className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 hover:shadow-sm hover:border-primary/10 transition-all cursor-pointer active:scale-[0.995]">
+        {conversations.map(c => (
+          <button key={c.id} onClick={() => { setOpen(c); setThread([{ from: 'them', text: c.lastMessage }]); }} className="w-full flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 hover:shadow-sm hover:border-primary/10 transition-all active:scale-[0.995]">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-heading text-sm font-bold text-primary">{c.name[0]}</div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 text-left">
               <p className="text-sm font-medium text-foreground">{c.name}</p>
               <p className="text-xs text-muted-foreground truncate">{c.lastMessage}</p>
             </div>
@@ -403,9 +421,27 @@ export function StudentChat() {
               <span className="text-[10px] text-muted-foreground">{c.time}</span>
               {c.unread > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">{c.unread}</span>}
             </div>
-          </div>
+          </button>
         ))}
       </div>
+      <DetailSheet
+        open={!!open}
+        onOpenChange={(o) => !o && setOpen(null)}
+        title={open?.name ?? ''}
+        description="Conversa"
+        footer={
+          <div className="flex items-center gap-2">
+            <input value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()} placeholder="Escrever mensagem…" className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm" />
+            <button onClick={send} className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"><Send className="h-4 w-4" /></button>
+          </div>
+        }
+      >
+        <div className="space-y-2">
+          {thread.map((m, i) => (
+            <div key={i} className={cn('max-w-[80%] rounded-2xl px-3 py-2 text-sm', m.from === 'me' ? 'ml-auto bg-primary text-primary-foreground' : 'bg-muted text-foreground')}>{m.text}</div>
+          ))}
+        </div>
+      </DetailSheet>
     </PageContainer>
   );
 }
