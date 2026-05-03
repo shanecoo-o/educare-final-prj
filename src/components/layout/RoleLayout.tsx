@@ -5,7 +5,7 @@ import { GraduationCap, ChevronLeft, LogOut, Search, Bell, User, Menu } from 'lu
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROLE_NAVIGATION, ROLE_BOTTOM_NAV } from '@/shared/navigation/roleNavigation';
-import { ROLE_LABELS } from '@/types/roles';
+import { ROLE_LABELS, ROLE_NOTIFICATIONS } from '@/types/roles';
 import { CommandSearch } from '@/components/search/CommandSearch';
 import type { NavItem } from '@/types/navigation';
 
@@ -80,21 +80,21 @@ export function RoleLayout() {
             className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
           >
             <User className="h-[18px] w-[18px] shrink-0" />
-            {!collapsed && <span>Settings</span>}
+            {!collapsed && <span>Definições</span>}
           </Link>
           <button
             onClick={handleLogout}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
           >
             <LogOut className="h-[18px] w-[18px] shrink-0" />
-            {!collapsed && <span>Sign out</span>}
+            {!collapsed && <span>Sair</span>}
           </button>
           <button
             onClick={() => setCollapsed((v) => !v)}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
           >
             <ChevronLeft className={cn('h-[18px] w-[18px] shrink-0 transition-transform duration-300', collapsed && 'rotate-180')} />
-            {!collapsed && <span>Collapse</span>}
+            {!collapsed && <span>Recolher</span>}
           </button>
         </div>
       </aside>
@@ -123,7 +123,7 @@ export function RoleLayout() {
           <button onClick={() => setSearchOpen(true)} className="relative w-full text-left group">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <div className="w-full rounded-xl border border-border bg-muted/50 py-2 pl-10 pr-4 text-sm text-muted-foreground group-hover:border-primary/20 transition-colors">
-              Search...
+              Pesquisar...
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex h-5 items-center gap-1 rounded border border-border bg-card px-1.5 text-[10px] font-medium text-muted-foreground">⌘K</kbd>
             </div>
           </button>
@@ -133,7 +133,10 @@ export function RoleLayout() {
           <button onClick={() => setSearchOpen(true)} className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted transition-colors md:hidden">
             <Search className="h-[18px] w-[18px]" />
           </button>
-          <button onClick={() => navigate(navItems.find(n => n.label === 'Notifications')?.path || '/app/notifications')} className="relative flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted transition-colors">
+          <button
+            onClick={() => navigate(ROLE_NOTIFICATIONS[role] ?? `/app/${role}/notifications`)}
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted transition-colors"
+          >
             <Bell className="h-[18px] w-[18px]" />
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
           </button>
