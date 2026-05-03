@@ -29,69 +29,104 @@ export { StudentDashboard } from '@/pages/app/RoleDashboards';
 
 /* ─── NOTAS ─── */
 export function StudentGrades() {
+  const [trimestre, setTrimestre] = useState<'1' | '2' | '3'>('2');
+  const [openSubject, setOpenSubject] = useState<string | null>(null);
+
   const subjectAverages = subjects.map(sub => ({
     ...sub,
     average: getSubjectAverage('ALU-001', sub.id),
-    mt: calcMT('ALU-001', sub.id, 2),
-    grades: studentGrades.filter(g => g.subjectId === sub.id),
+    mt: calcMT('ALU-001', sub.id, Number(trimestre)),
+    grades: studentGrades.filter(g => g.subjectId === sub.id && g.trimestre === Number(trimestre)),
   })).filter(s => s.grades.length > 0);
+
+  const active = openSubject ? subjectAverages.find(s => s.id === openSubject) : null;
 
   return (
     <PageContainer>
-      <div className="mb-6">
+      <div className="mb-5">
         <h1 className="font-heading text-2xl font-bold text-foreground">As Minhas Notas</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Desempenho académico — 2º Trimestre. Escala: 0–20. Aprovação: MA ≥ 10.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Escala 0–20. Aprovação: MA ≥ 10.</p>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="mb-4 flex items-center gap-2 max-w-xs">
+        <Select value={trimestre} onValueChange={(v) => setTrimestre(v as '1' | '2' | '3')}>
+          <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">1º Trimestre</SelectItem>
+            <SelectItem value="2">2º Trimestre</SelectItem>
+            <SelectItem value="3">3º Trimestre</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatsCard label="Média" value={currentStudent.media.toFixed(1)} icon={TrendingUp} variant="primary" />
         <StatsCard label="Disciplinas" value={subjects.length} icon={BookOpen} />
         <StatsCard label="Avaliações" value={studentGrades.length} icon={ClipboardList} />
         <StatsCard label="Melhor" value="Inglês" icon={GraduationCap} />
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {subjectAverages.map(sub => (
-          <div key={sub.id} className="rounded-2xl border border-border bg-card p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <h3 className="font-heading text-sm font-semibold text-foreground">{sub.name}</h3>
+          <button
+            key={sub.id}
+            onClick={() => setOpenSubject(sub.id)}
+            className="w-full text-left rounded-2xl border border-border bg-card p-4 hover:shadow-sm hover:border-primary/20 transition-all active:scale-[0.997]"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <h3 className="font-heading text-sm font-semibold text-foreground truncate">{sub.name}</h3>
                 {sub.tipo === 'extracurricular' && (
                   <span className="flex items-center gap-0.5 rounded-md bg-accent px-1.5 py-0.5 text-[10px] font-medium text-accent-foreground">
                     <Sparkles className="h-2.5 w-2.5" /> Extra
                   </span>
                 )}
               </div>
-              <div className="text-right">
+              <div className="text-right shrink-0">
                 <span className="font-heading text-xl font-bold text-foreground">{sub.mt ?? sub.average}</span>
                 <span className="text-sm text-muted-foreground">/20</span>
               </div>
             </div>
-            <div className="h-1.5 w-full rounded-full bg-muted mb-3">
+            <div className="h-1.5 w-full rounded-full bg-muted">
               <div
-                className={cn('h-1.5 rounded-full transition-all', (sub.mt ?? sub.average) >= 14 ? 'bg-success' : (sub.mt ?? sub.average) >= 10 ? 'bg-warning' : 'bg-destructive')}
+                className={cn('h-1.5 rounded-full', (sub.mt ?? sub.average) >= 14 ? 'bg-success' : (sub.mt ?? sub.average) >= 10 ? 'bg-warning' : 'bg-destructive')}
                 style={{ width: `${((sub.mt ?? sub.average) / 20) * 100}%` }}
               />
             </div>
-            <p className="text-xs text-muted-foreground mb-2">{sub.teacherName} · {sub.code}</p>
-            {sub.grades.length > 0 && (
-              <div className="space-y-1">
-                {sub.grades.map(g => (
-                  <div key={g.id} className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted/50 transition-colors">
-                    <div className="flex items-center gap-2">
+            <p className="mt-2 text-[11px] text-muted-foreground">{sub.teacherName} · {sub.grades.length} avaliação(ões)</p>
+          </button>
+        ))}
+      </div>
+
+      <DetailSheet
+        open={!!openSubject}
+        onOpenChange={(o) => !o && setOpenSubject(null)}
+        title={active?.name ?? ''}
+        description={active ? `${active.teacherName} · ${active.code}` : ''}
+      >
+        {active && (
+          <div className="space-y-4">
+            <div className="rounded-xl bg-muted/40 p-4 text-center">
+              <p className="text-[11px] text-muted-foreground">Média do trimestre</p>
+              <p className="font-heading text-3xl font-bold text-foreground">{active.mt ?? active.average}<span className="text-base text-muted-foreground">/20</span></p>
+            </div>
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Avaliações</p>
+              <div className="space-y-1.5">
+                {active.grades.map(g => (
+                  <div key={g.id} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                    <div className="flex items-center gap-2 min-w-0">
                       <StatusBadge label={g.tipo} variant={g.tipo === 'ACP' ? 'primary' : g.tipo === 'ACS2' ? 'info' : 'muted'} />
-                      <span className="text-sm text-foreground">{g.avaliacao}</span>
+                      <span className="text-sm text-foreground truncate">{g.avaliacao}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-heading text-sm font-bold text-foreground">{g.nota}/{g.maxNota}</span>
-                    </div>
+                    <span className="font-heading text-sm font-bold text-foreground">{g.nota}/{g.maxNota}</span>
                   </div>
                 ))}
               </div>
-            )}
+            </div>
           </div>
-        ))}
-      </div>
+        )}
+      </DetailSheet>
     </PageContainer>
   );
 }
