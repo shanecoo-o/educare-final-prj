@@ -471,7 +471,7 @@ export function GuardianNotifications() {
               <p className="text-[10px] text-muted-foreground mt-1">{n.time}</p>
             </div>
             {!n.read && <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />}
-          </div>
+          </button>
         ))}
       </div>
     </PageContainer>
