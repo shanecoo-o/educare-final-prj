@@ -35,8 +35,8 @@ export function AlertCard({ icon: Icon = AlertTriangle, title, description, vari
         <p className="text-sm font-medium text-foreground">{title}</p>
         <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
       </div>
-      {action && (
-        <button onClick={onAction} className="shrink-0 text-xs font-medium text-primary hover:underline">
+      {action && onAction && (
+        <button type="button" onClick={onAction} className="shrink-0 text-xs font-medium text-primary hover:underline active:scale-95 transition-transform">
           {action}
         </button>
       )}
