@@ -7,12 +7,13 @@ interface ScheduleViewProps {
   schedule: ScheduleSlot[];
   showTeacher?: boolean;
   showClassGroup?: boolean;
+  onSlotClick?: (slot: ScheduleSlot) => void;
 }
 
 const DAYS: ScheduleSlot['day'][] = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 const DAY_SHORT: Record<string, string> = { Segunda: 'Seg', Terça: 'Ter', Quarta: 'Qua', Quinta: 'Qui', Sexta: 'Sex' };
 
-export function ScheduleView({ schedule, showTeacher = true, showClassGroup = false }: ScheduleViewProps) {
+export function ScheduleView({ schedule, showTeacher = true, showClassGroup = false, onSlotClick }: ScheduleViewProps) {
   const todayIdx = Math.max(0, Math.min(4, new Date().getDay() - 1));
   const [selectedDay, setSelectedDay] = useState<ScheduleSlot['day']>(DAYS[todayIdx] || 'Segunda');
 
@@ -79,11 +80,15 @@ export function ScheduleView({ schedule, showTeacher = true, showClassGroup = fa
         </div>
       ) : (
         <div className="space-y-1.5">
-          {daySlots.map((slot) => (
-            <div
+          {daySlots.map((slot) => {
+            const Component: any = onSlotClick ? 'button' : 'div';
+            return (
+            <Component
               key={slot.id}
+              {...(onSlotClick ? { type: 'button', onClick: () => onSlotClick(slot) } : {})}
               className={cn(
-                'flex items-center gap-3 rounded-xl border px-4 py-3 transition-all',
+                'w-full text-left flex items-center gap-3 rounded-xl border px-4 py-3 transition-all',
+                onSlotClick && 'hover:shadow-sm active:scale-[0.997]',
                 slot.status === 'ongoing'
                   ? 'border-primary/30 bg-primary/5 shadow-sm'
                   : slot.status === 'completed'
@@ -147,8 +152,9 @@ export function ScheduleView({ schedule, showTeacher = true, showClassGroup = fa
                   <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
                 )}
               </div>
-            </div>
-          ))}
+            </Component>
+            );
+          })}
         </div>
       )}
     </div>
