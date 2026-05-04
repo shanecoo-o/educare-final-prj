@@ -92,6 +92,7 @@ const secretaryNav: NavItem[] = [
   { label: 'Documentos', path: '/app/secretary/documents', icon: FolderOpen },
   { label: 'Turmas', path: '/app/secretary/classes', icon: BookOpen },
   { label: 'Horário', path: '/app/secretary/schedule', icon: Calendar },
+  { label: 'Regularidade', path: '/app/secretary/regularity', icon: CheckCircle },
 ];
 
 /* ─── Finanças ─── */

@@ -32,7 +32,7 @@ export function StudentDashboard() {
         description="O teu desempenho em Biologia está em 11/20. Revê os materiais recentes."
         variant="warning"
         action="Ver Disciplina"
-        onAction={() => navigate('/app/student/grades')}
+        onAction={() => navigate('/app/student/knowledge?subject=Biologia')}
       />
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
