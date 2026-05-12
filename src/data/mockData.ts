@@ -1,4 +1,4 @@
-/* ─── EDUCORE — Dados Centralizados (Moçambique) ─── */
+/* ─── Colégio Belo Horizonte — Dados Centralizados (Moçambique) ─── */
 
 export interface Student {
   id: string;
