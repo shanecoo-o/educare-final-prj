@@ -84,8 +84,8 @@ export default function DashboardPage() {
         <img src={campusHero} alt="Campus" className="h-40 w-full object-cover md:h-48" />
         <div className="absolute inset-0 bg-gradient-to-r from-foreground/60 to-transparent" />
         <div className="absolute bottom-4 left-5 md:bottom-6 md:left-8">
-          <h1 className="font-heading text-xl font-bold text-primary-foreground md:text-2xl">Welcome back</h1>
-          <p className="mt-0.5 text-sm text-primary-foreground/80">Educare Smart — Tudo num só lugar</p>
+          <h1 className="font-heading text-xl font-bold text-primary-foreground md:text-2xl">Bem-vindo de volta</h1>
+          <p className="mt-0.5 text-sm text-primary-foreground/80">Colégio Belo Horizonte — Tudo num só lugar</p>
         </div>
       </div>
 
