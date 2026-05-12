@@ -55,7 +55,7 @@ export default function LandingPage() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary-soft/60 px-3 py-1 text-xs font-medium text-primary">
                 <Sparkles className="h-3.5 w-3.5" />
-                Plataforma oficial do Colégio Educare
+                Plataforma oficial do Colégio Belo Horizonte
               </div>
               <h1 className="mt-5 font-heading text-4xl font-extrabold leading-[1.05] tracking-tight text-foreground md:text-6xl">
                 Educação que se gere
@@ -63,7 +63,7 @@ export default function LandingPage() {
                 <span className="bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">com excelência.</span>
               </h1>
               <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                A <strong className="text-foreground">Educare Smart</strong> conecta alunos, famílias, professores e administração numa experiência institucional moderna, segura e desenhada para Moçambique.
+                O <strong className="text-foreground">Portal do Colégio Belo Horizonte</strong> conecta alunos, famílias, professores e administração numa experiência institucional moderna, segura e desenhada para Moçambique.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <Link to="/login" className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-md hover:bg-primary-deep transition-all">
@@ -182,7 +182,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-primary/15 bg-gradient-to-br from-primary via-primary-deep to-primary p-8 text-center text-primary-foreground shadow-xl md:p-14">
           <ShieldCheck className="mx-auto h-10 w-10 text-accent" />
           <h2 className="mt-4 font-heading text-3xl font-bold md:text-4xl">Pronto para elevar a sua escola?</h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-primary-foreground/80 md:text-base">Junte-se a uma nova geração de instituições que escolhem a Educare Smart para transformar a sua gestão.</p>
+          <p className="mx-auto mt-3 max-w-xl text-sm text-primary-foreground/80 md:text-base">O Colégio Belo Horizonte adopta uma plataforma moderna para acompanhar cada aluno com excelência.</p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <Link to="/apply" className="inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-md hover:brightness-105 transition-all">
               Iniciar candidatura <ArrowRight className="h-4 w-4" />

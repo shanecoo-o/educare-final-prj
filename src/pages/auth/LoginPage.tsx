@@ -50,7 +50,7 @@ export default function LoginPage() {
         <div className="mb-6 flex flex-col items-center text-center">
           <Brand size="lg" variant="mark" />
           <h1 className="mt-4 font-heading text-2xl font-bold text-foreground">Bem-vindo de volta</h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">Aceda à plataforma <span className="font-semibold text-foreground">Educare Smart</span></p>
+          <p className="mt-1.5 text-sm text-muted-foreground">Portal do <span className="font-semibold text-foreground">Colégio Belo Horizonte</span></p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card/80 p-6 shadow-xl backdrop-blur-sm">
@@ -95,7 +95,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="nome@educare.co.mz"
+              placeholder="nome@colegiobelohorizonte.mz"
               className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-primary/40 transition-all"
             />
           </div>
