@@ -37,7 +37,7 @@ export function PublicFooter() {
       <div className="mx-auto flex max-w-6xl flex-col gap-4 text-center md:flex-row md:items-center md:justify-between md:text-left">
         <div className="flex items-center justify-center gap-3 md:justify-start">
           <Brand size="sm" />
-          <span className="text-xs text-muted-foreground">© 2026 Colégio Educare</span>
+          <span className="text-xs text-muted-foreground">© 2026 Colégio Belo Horizonte · Campoane, Boane</span>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
           <Link to="/features" className="hover:text-foreground">Funcionalidades</Link>
@@ -67,7 +67,7 @@ export function FeaturesPage() {
         <div className="mx-auto max-w-5xl">
           <div className="text-center mb-10">
             <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Uma plataforma. Todos os perfis.</h1>
-            <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">A Educare Smart conecta alunos, famílias, professores e administração num único sistema, adaptado ao modelo escolar moçambicano.</p>
+            <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">O Portal do Colégio Belo Horizonte conecta alunos, famílias, professores e administração num único sistema, adaptado ao modelo escolar moçambicano.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {personas.map(p => (
@@ -115,12 +115,12 @@ export function ContactPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             {[
-              { label: 'Endereço', value: 'Av. Eduardo Mondlane, 1234, Maputo' },
-              { label: 'Telefone', value: '+258 21 123 456' },
-              { label: 'Email', value: 'apoio@educare.co.mz' },
-              { label: 'Horário', value: 'Seg–Sex · 08h00–17h00' },
-              { label: 'Suporte', value: 'WhatsApp +258 84 999 0000' },
-              { label: 'Comercial', value: 'comercial@educare.co.mz' },
+              { label: 'Endereço', value: 'Campoane, Boane · Província de Maputo' },
+              { label: 'Telefone', value: '+258 84 344 4400' },
+              { label: 'Email', value: 'colegiobelohorizonte.moz@gmail.com' },
+              { label: 'Horário', value: 'Seg–Sex · 07h30–16h30' },
+              { label: 'Suporte', value: 'WhatsApp +258 84 344 4400' },
+              { label: 'Secretaria', value: 'colegiobelohorizonte.moz@gmail.com' },
             ].map(c => (
               <div key={c.label} className="rounded-xl border border-border bg-card p-4">
                 <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{c.label}</p>
